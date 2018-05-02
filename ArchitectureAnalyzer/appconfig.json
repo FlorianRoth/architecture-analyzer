@@ -1,0 +1,14 @@
+﻿{
+    "Neo4j": {
+        "Host": "http://localhost:7474/db/data",
+        "User": "test",
+        "Password": "test"
+    },
+    "Scanner":
+    {
+        "Dotnet": {
+            "Assemblies": [
+            ]
+        } 
+    }
+}
