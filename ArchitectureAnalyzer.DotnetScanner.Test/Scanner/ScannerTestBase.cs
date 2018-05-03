@@ -61,17 +61,17 @@
 
         protected static NetAssembly NetAssembly(string id)
         {
-            return new NetAssembly(id);
+            return new NetAssembly { Id = id };
         }
 
         protected static NetType NetType<T>()
         {
-            return new NetType(typeof(T).FullName);
+            return new NetType { Id = typeof(T).FullName };
         }
 
         protected static NetMethod NetMethod<T>(string methodName)
         {
-            return new NetMethod(typeof(T).FullName + "." + methodName);
+            return new NetMethod { Id = typeof(T).FullName + "." + methodName };
         }
     }
 }

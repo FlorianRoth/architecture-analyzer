@@ -11,10 +11,5 @@
         public bool IsStatic { get; set; }
 
         public bool IsSealed { get; set; }
-
-        public NetMethod(string id)
-            : base(id)
-        {
-        }
     }
 }

@@ -40,7 +40,7 @@
         [JsonIgnore]
         public IList<NetType> Attributes { get; set; }
 
-        public NetType(string id) : base(id)
+        public NetType()
         {
             Implements = new List<NetType>();
             Attributes = new List<NetType>();

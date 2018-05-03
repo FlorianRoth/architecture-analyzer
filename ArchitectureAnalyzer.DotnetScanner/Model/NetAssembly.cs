@@ -17,7 +17,7 @@ namespace ArchitectureAnalyzer.DotnetScanner.Model
         [JsonIgnore]
         public IList<NetType> DefinedTypes { get; set; }
 
-        public NetAssembly(string id) : base(id)
+        public NetAssembly()
         {
             References = new List<NetAssembly>();
             DefinedTypes = new List<NetType>();

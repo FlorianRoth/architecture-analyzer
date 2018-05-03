@@ -3,12 +3,8 @@ namespace ArchitectureAnalyzer.Core.Graph
 {
     public abstract class Node
     {
-        public string Id { get; }
-
-        protected Node(string id)
-        {
-            Id = id;
-        }
+        public string Id { get; set; }
+        
 
         public override bool Equals(object obj)
         {
@@ -29,7 +25,7 @@ namespace ArchitectureAnalyzer.Core.Graph
 
         public override int GetHashCode()
         {
-            return Id.GetHashCode();
+            return Id?.GetHashCode() ?? 0;
         }
 
         public override string ToString()

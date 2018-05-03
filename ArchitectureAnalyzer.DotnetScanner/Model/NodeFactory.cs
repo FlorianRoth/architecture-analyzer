@@ -1,6 +1,5 @@
 ﻿namespace ArchitectureAnalyzer.DotnetScanner.Model
 {
-    using System;
     using System.Collections.Generic;
 
     using ArchitectureAnalyzer.Core.Graph;
@@ -15,9 +14,9 @@
 
         public ModelFactory()
         {
-            _assemblyMap = new ModelMap<NetAssembly>(id => new NetAssembly(id));
-            _typeMap = new ModelMap<NetType>(id => new NetType(id));
-            _methodMap = new ModelMap<NetMethod>(id => new NetMethod(id));
+            _assemblyMap = new ModelMap<NetAssembly>();
+            _typeMap = new ModelMap<NetType>();
+            _methodMap = new ModelMap<NetMethod>();
         }
 
         public NetAssembly CreateAssemblyModel(string id)
@@ -35,15 +34,12 @@
             return _methodMap.Get(id);
         }
 
-        private class ModelMap<TNode> where TNode : Node
+        private class ModelMap<TNode> where TNode : Node, new()
         {
-            private readonly Func<string, TNode> _createNode;
-
             private readonly IDictionary<string, TNode> _nodeMap;
 
-            public ModelMap(Func<string, TNode> createNode)
+            public ModelMap()
             {
-                _createNode = createNode;
                 _nodeMap = new Dictionary<string, TNode>();
             }
 
@@ -51,7 +47,7 @@
             {
                 if (_nodeMap.TryGetValue(id, out var node) == false)
                 {
-                    node = _createNode(id);
+                    node = new TNode {Id = id };
                     _nodeMap.Add(id, node);
                 }
 
