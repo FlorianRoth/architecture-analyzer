@@ -14,6 +14,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ArchitectureAnalyzer.DotnetScanner\ArchitectureAnalyzer.DotnetScanner.csproj" />
+    <ProjectReference Include="..\ArchitectureAnalyzer.Net.Model\ArchitectureAnalyzer.Net.Model.csproj" />
     <ProjectReference Include="..\TestLibrary\TestLibrary.csproj" />
   </ItemGroup>
 

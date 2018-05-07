@@ -122,7 +122,7 @@
 
             var model = _scanner.ScanType(type);
 
-            Assert.That(model.Type, Is.EqualTo(Model.NetType.TypeClass.Class));
+            Assert.That(model.Type, Is.EqualTo(Net.Model.NetType.TypeClass.Class));
         }
 
         [Test]
@@ -132,7 +132,7 @@
 
             var model = _scanner.ScanType(type);
 
-            Assert.That(model.Type, Is.EqualTo(Model.NetType.TypeClass.Interface));
+            Assert.That(model.Type, Is.EqualTo(Net.Model.NetType.TypeClass.Interface));
         }
 
         [Test]
@@ -142,7 +142,7 @@
 
             var model = _scanner.ScanType(type);
 
-            Assert.That(model.Type, Is.EqualTo(Model.NetType.TypeClass.Enum));
+            Assert.That(model.Type, Is.EqualTo(Net.Model.NetType.TypeClass.Enum));
         }
     }
 }

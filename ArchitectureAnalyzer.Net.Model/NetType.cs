@@ -1,4 +1,4 @@
-﻿namespace ArchitectureAnalyzer.DotnetScanner.Model
+﻿namespace ArchitectureAnalyzer.Net.Model
 {
     using System.Collections.Generic;
 
@@ -54,11 +54,6 @@
         public override string ToString()
         {
             return $"NetType({Namespace}.{Name})";
-        }
-
-        public TypeKey GetKey()
-        {
-            return new TypeKey(Namespace, Name);
         }
     }
 }

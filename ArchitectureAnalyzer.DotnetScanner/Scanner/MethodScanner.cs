@@ -7,6 +7,7 @@
 
     using ArchitectureAnalyzer.DotnetScanner.Model;
     using ArchitectureAnalyzer.DotnetScanner.Utils;
+    using ArchitectureAnalyzer.Net.Model;
 
     using Microsoft.Extensions.Logging;
 

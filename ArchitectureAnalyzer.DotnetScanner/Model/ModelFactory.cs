@@ -3,7 +3,8 @@
     using System.Collections.Generic;
 
     using ArchitectureAnalyzer.Core.Graph;
-    
+    using ArchitectureAnalyzer.Net.Model;
+
     internal class ModelFactory : IModelFactory
     {
         private readonly ModelMap<AssemblyKey, NetAssembly> _assemblyMap;

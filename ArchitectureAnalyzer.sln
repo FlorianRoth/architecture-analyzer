@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27428.2027
+VisualStudioVersion = 15.0.27130.2036
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ArchitectureAnalyzer", "ArchitectureAnalyzer\ArchitectureAnalyzer.csproj", "{A0290A23-3D87-4DA9-A7FA-4FF60C07467C}"
 EndProject
@@ -11,9 +11,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ArchitectureAnalyzer.Core",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ArchitectureAnalyzer.Neo4j", "ArchitectureAnalyzer.Neo4j\ArchitectureAnalyzer.Neo4j.csproj", "{A1C91CA6-D305-4734-B389-67B80A42C91D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchitectureAnalyzer.DotnetScanner.Test", "ArchitectureAnalyzer.DotnetScanner.Test\ArchitectureAnalyzer.DotnetScanner.Test.csproj", "{51A2C7B8-3DEB-4D27-8C80-A02E8D13BD19}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ArchitectureAnalyzer.DotnetScanner.Test", "ArchitectureAnalyzer.DotnetScanner.Test\ArchitectureAnalyzer.DotnetScanner.Test.csproj", "{51A2C7B8-3DEB-4D27-8C80-A02E8D13BD19}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestLibrary", "TestLibrary\TestLibrary.csproj", "{93AE81AC-EF7B-4C16-A3F3-8A0FD1E7B177}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestLibrary", "TestLibrary\TestLibrary.csproj", "{93AE81AC-EF7B-4C16-A3F3-8A0FD1E7B177}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchitectureAnalyzer.Net.Model", "ArchitectureAnalyzer.Net.Model\ArchitectureAnalyzer.Net.Model.csproj", "{7714DC52-0A92-4CA2-8EB3-7E616F575A8B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{93AE81AC-EF7B-4C16-A3F3-8A0FD1E7B177}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{93AE81AC-EF7B-4C16-A3F3-8A0FD1E7B177}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{93AE81AC-EF7B-4C16-A3F3-8A0FD1E7B177}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7714DC52-0A92-4CA2-8EB3-7E616F575A8B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7714DC52-0A92-4CA2-8EB3-7E616F575A8B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7714DC52-0A92-4CA2-8EB3-7E616F575A8B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7714DC52-0A92-4CA2-8EB3-7E616F575A8B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

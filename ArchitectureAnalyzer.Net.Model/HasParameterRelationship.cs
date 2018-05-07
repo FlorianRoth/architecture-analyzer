@@ -1,5 +1,5 @@
 ﻿
-namespace ArchitectureAnalyzer.DotnetScanner.Model
+namespace ArchitectureAnalyzer.Net.Model
 {
     public class HasParameterRelationship
     {

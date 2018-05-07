@@ -4,8 +4,15 @@ namespace ArchitectureAnalyzer.DotnetScanner.Model
     using System.Collections.Generic;
     using System.Linq;
 
+    using ArchitectureAnalyzer.Net.Model;
+
     public static class TypeKeyExtensions
     {
+        public static TypeKey GetKey(this NetType type)
+        {
+            return new TypeKey(type.Namespace, type.Name);
+        }
+
         public static TypeKey ToArrayType(this TypeKey key)
         {
             return new TypeKey(key.Namespace, key.Name + "[]");

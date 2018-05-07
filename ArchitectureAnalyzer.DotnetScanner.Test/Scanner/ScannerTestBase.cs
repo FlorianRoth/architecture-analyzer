@@ -4,6 +4,7 @@
     using System.Linq;
 
     using ArchitectureAnalyzer.DotnetScanner.Model;
+    using ArchitectureAnalyzer.Net.Model;
 
     using FakeItEasy;
 

@@ -9,6 +9,7 @@ namespace ArchitectureAnalyzer.DotnetScanner.Scanner
 
     using ArchitectureAnalyzer.DotnetScanner.Model;
     using ArchitectureAnalyzer.DotnetScanner.Utils;
+    using ArchitectureAnalyzer.Net.Model;
 
     internal class SignatureTypeProvider : ISignatureTypeProvider<NetType, object>
     {

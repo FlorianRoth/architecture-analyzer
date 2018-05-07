@@ -10,6 +10,7 @@
     using ArchitectureAnalyzer.Core.Graph;
     using ArchitectureAnalyzer.Core.Scanner;
     using ArchitectureAnalyzer.DotnetScanner.Model;
+    using ArchitectureAnalyzer.Net.Model;
 
     using Microsoft.Extensions.Logging;
 
@@ -52,7 +53,7 @@
             _logger.LogInformation("Scan complete");
         }
 
-        private IEnumerable<NetAssembly> ScanAssemblies()
+        private IReadOnlyList<NetAssembly> ScanAssemblies()
         {
             return _assemblies
                 .Select(ScanAssembly)

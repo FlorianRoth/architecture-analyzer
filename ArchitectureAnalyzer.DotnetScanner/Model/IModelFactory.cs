@@ -2,6 +2,8 @@
 {
     using System.Collections.Generic;
 
+    using ArchitectureAnalyzer.Net.Model;
+
     public interface IModelFactory
     {
         NetAssembly CreateAssemblyModel(AssemblyKey key);

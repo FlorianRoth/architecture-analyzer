@@ -1,4 +1,4 @@
-﻿namespace ArchitectureAnalyzer.DotnetScanner.Model
+﻿namespace ArchitectureAnalyzer.Net.Model
 {
     using System.Collections.Generic;
 
