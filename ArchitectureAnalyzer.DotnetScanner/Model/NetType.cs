@@ -29,15 +29,21 @@
 
         public bool IsSealed { get; set; }
 
+        public bool HasAttribute { get; set; }
+
         [JsonIgnore]
         public NetType BaseType { get; set; }
 
         [JsonIgnore]
         public IList<NetType> Implements { get; set; }
 
+        [JsonIgnore]
+        public IList<NetType> Attributes { get; set; }
+
         public NetType(string id) : base(id)
         {
             Implements = new List<NetType>();
+            Attributes = new List<NetType>();
         }
     }
 }

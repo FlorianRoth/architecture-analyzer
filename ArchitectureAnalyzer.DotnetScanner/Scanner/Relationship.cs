@@ -12,5 +12,7 @@ namespace ArchitectureAnalyzer.DotnetScanner.Scanner
         public const string IMPLEMENTS = "IMPLEMENTS";
 
         public const string DEPENDS_ON = "DEPENDS_ON";
+
+        public const string HAS_ATTRIBUTE = "HAS_ATTRIBUTE";
     }
 }

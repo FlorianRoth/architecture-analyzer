@@ -69,6 +69,7 @@
             Assert.That(model.IsStatic, Is.False);
             Assert.That(model.IsAbstract, Is.False);
             Assert.That(model.IsSealed, Is.False);
+            Assert.That(model.HasAttribute, Is.False);
         }
 
         [Test]
@@ -81,6 +82,7 @@
             Assert.That(model.IsStatic, Is.True);
             Assert.That(model.IsAbstract, Is.False);
             Assert.That(model.IsSealed, Is.False);
+            Assert.That(model.HasAttribute, Is.False);
         }
 
         [Test]
@@ -93,6 +95,7 @@
             Assert.That(model.IsStatic, Is.False);
             Assert.That(model.IsAbstract, Is.True);
             Assert.That(model.IsSealed, Is.False);
+            Assert.That(model.HasAttribute, Is.False);
         }
 
         [Test]
@@ -105,8 +108,35 @@
             Assert.That(model.IsStatic, Is.False);
             Assert.That(model.IsAbstract, Is.False);
             Assert.That(model.IsSealed, Is.True);
+            Assert.That(model.HasAttribute, Is.False);
         }
-        
+
+        [Test]
+        public void HasAttributeFlagIsSetForUserTypeAttributedClass()
+        {
+            var type = GetTypeDefintion(typeof(UserTypeAttributedClass));
+
+            var model = _scanner.ScanType(type);
+
+            Assert.That(model.IsStatic, Is.False);
+            Assert.That(model.IsAbstract, Is.False);
+            Assert.That(model.IsSealed, Is.False);
+            Assert.That(model.HasAttribute, Is.True);
+        }
+
+        [Test]
+        public void HasAttributeFlagIsSetForTestFixtureClass()
+        {
+            var type = GetTypeDefintion(typeof(TestFixtureAttributedClass));
+
+            var model = _scanner.ScanType(type);
+
+            Assert.That(model.IsStatic, Is.False);
+            Assert.That(model.IsAbstract, Is.False);
+            Assert.That(model.IsSealed, Is.False);
+            Assert.That(model.HasAttribute, Is.True);
+        }
+
         [Test]
         public void TypeIsClassForClass()
         {
