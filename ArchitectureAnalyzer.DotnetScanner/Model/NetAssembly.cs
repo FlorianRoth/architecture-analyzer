@@ -22,5 +22,10 @@ namespace ArchitectureAnalyzer.DotnetScanner.Model
             References = new List<NetAssembly>();
             DefinedTypes = new List<NetType>();
         }
+        
+        public override string ToString()
+        {
+            return $"NetAssembly({Name})";
+        }
     }
 }

@@ -4,11 +4,11 @@
 
     public interface IModelFactory
     {
-        NetAssembly CreateAssemblyModel(string id);
+        NetAssembly CreateAssemblyModel(AssemblyKey key);
 
-        NetType CreateTypeModel(string id);
+        NetType CreateTypeModel(TypeKey key);
 
-        NetMethod CreateMethodModel(string id);
+        NetMethod CreateMethodModel(MethodKey key);
 
         IEnumerable<NetAssembly> GetAssemblyModels();
         

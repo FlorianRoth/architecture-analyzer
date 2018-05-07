@@ -21,5 +21,10 @@
 
         [JsonIgnore]
         public IReadOnlyList<NetType> ParameterTypes { get; set; }
+
+        public override string ToString()
+        {
+            return $"NetMethod({Name})";
+        }
     }
 }

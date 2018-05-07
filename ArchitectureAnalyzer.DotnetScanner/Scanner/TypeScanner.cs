@@ -12,6 +12,8 @@
 
     internal class TypeScanner : AbstractScanner
     {
+        private static readonly TypeKey EnumKey = new TypeKey(typeof(Enum).Namespace, typeof(Enum).Name);
+
         public TypeScanner(MetadataReader reader, IModelFactory factory, ILogger logger)
             : base(reader, factory, logger)
         {
@@ -26,7 +28,7 @@
                 return null;
             }
 
-            var typeModel = Factory.CreateTypeModel(type.GetTypeId(Reader));
+            var typeModel = Factory.CreateTypeModel(type.GetTypeKey(Reader));
             typeModel.Type = GetTypeClass(type);
             typeModel.Name = type.Name.GetString(Reader);
             typeModel.Namespace = type.Namespace.GetString(Reader);
@@ -65,7 +67,7 @@
             }
 
             var baseType = GetTypeFromEntityHandle(type.BaseType);
-            if (Equals(baseType?.Id, typeof(Enum).FullName))
+            if (Equals(baseType?.GetKey(), EnumKey))
             {
                 return NetType.TypeClass.Enum;
             }
@@ -179,13 +181,13 @@
 
         private NetType GetTypeFromTypeReferenceHandle(TypeReferenceHandle handle)
         {
-            var id = Reader.GetTypeReference(handle).GetTypeId(Reader);
+            var id = Reader.GetTypeReference(handle).GetTypeKey(Reader);
             return Factory.CreateTypeModel(id);
         }
 
         private NetType GetTypeFromTypeDefinitonHandle(TypeDefinitionHandle handle)
         {
-            var id = Reader.GetTypeDefinition(handle).GetTypeId(Reader);
+            var id = Reader.GetTypeDefinition(handle).GetTypeKey(Reader);
             return Factory.CreateTypeModel(id);
         }
 

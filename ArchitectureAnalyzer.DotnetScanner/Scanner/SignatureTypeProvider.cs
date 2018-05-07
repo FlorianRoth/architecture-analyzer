@@ -24,59 +24,59 @@ namespace ArchitectureAnalyzer.DotnetScanner.Scanner
             switch (typeCode)
             {
                 case PrimitiveTypeCode.Boolean:
-                    return _factory.CreateTypeModel(typeof(bool).Name);
+                    return _factory.CreateTypeModel(TypeKey.FromType<bool>());
 
                 case PrimitiveTypeCode.Byte:
-                    return _factory.CreateTypeModel(typeof(byte).Name);
+                    return _factory.CreateTypeModel(TypeKey.FromType<byte>());
 
                 case PrimitiveTypeCode.SByte:
-                    return _factory.CreateTypeModel(typeof(sbyte).Name);
+                    return _factory.CreateTypeModel(TypeKey.FromType<sbyte>());
 
                 case PrimitiveTypeCode.Char:
-                    return _factory.CreateTypeModel(typeof(char).Name);
+                    return _factory.CreateTypeModel(TypeKey.FromType<char>());
 
                 case PrimitiveTypeCode.Int16:
-                    return _factory.CreateTypeModel(typeof(short).Name);
+                    return _factory.CreateTypeModel(TypeKey.FromType<short>());
 
                 case PrimitiveTypeCode.UInt16:
-                    return _factory.CreateTypeModel(typeof(ushort).Name);
+                    return _factory.CreateTypeModel(TypeKey.FromType<ushort>());
 
                 case PrimitiveTypeCode.Int32:
-                    return _factory.CreateTypeModel(typeof(int).Name);
+                    return _factory.CreateTypeModel(TypeKey.FromType<int>());
 
                 case PrimitiveTypeCode.UInt32:
-                    return _factory.CreateTypeModel(typeof(uint).Name);
+                    return _factory.CreateTypeModel(TypeKey.FromType<uint>());
 
                 case PrimitiveTypeCode.Int64:
-                    return _factory.CreateTypeModel(typeof(long).Name);
+                    return _factory.CreateTypeModel(TypeKey.FromType<long>());
 
                 case PrimitiveTypeCode.UInt64:
-                    return _factory.CreateTypeModel(typeof(ulong).Name);
+                    return _factory.CreateTypeModel(TypeKey.FromType<ulong>());
 
                 case PrimitiveTypeCode.Single:
-                    return _factory.CreateTypeModel(typeof(float).Name);
+                    return _factory.CreateTypeModel(TypeKey.FromType<float>());
 
                 case PrimitiveTypeCode.Double:
-                    return _factory.CreateTypeModel(typeof(double).Name);
+                    return _factory.CreateTypeModel(TypeKey.FromType<double>());
 
                 case PrimitiveTypeCode.IntPtr:
-                    return _factory.CreateTypeModel(typeof(IntPtr).Name);
+                    return _factory.CreateTypeModel(TypeKey.FromType<IntPtr>());
 
                 case PrimitiveTypeCode.UIntPtr:
-                    return _factory.CreateTypeModel(typeof(UIntPtr).Name);
+                    return _factory.CreateTypeModel(TypeKey.FromType<UIntPtr>());
 
                 case PrimitiveTypeCode.Object:
-                    return _factory.CreateTypeModel(typeof(object).Name);
+                    return _factory.CreateTypeModel(TypeKey.FromType<object>());
 
                 case PrimitiveTypeCode.String:
-                    return _factory.CreateTypeModel(typeof(string).Name);
+                    return _factory.CreateTypeModel(TypeKey.FromType<string>());
 
                 case PrimitiveTypeCode.TypedReference:
                     // todo: not sure
-                    return _factory.CreateTypeModel(typeof(TypeReference).Name);
+                    return _factory.CreateTypeModel(TypeKey.FromType<TypeReference>());
 
                 case PrimitiveTypeCode.Void:
-                    return _factory.CreateTypeModel(typeof(void).Name);
+                    return _factory.CreateTypeModel(TypeKey.FromType(typeof(void)));
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(typeCode), typeCode, null);
@@ -88,7 +88,7 @@ namespace ArchitectureAnalyzer.DotnetScanner.Scanner
             TypeDefinitionHandle handle,
             byte rawTypeKind)
         {
-            return _factory.CreateTypeModel(handle.GetTypeId(reader));
+            return _factory.CreateTypeModel(handle.GetTypeKey(reader));
         }
 
         public NetType GetTypeFromReference(
@@ -96,7 +96,7 @@ namespace ArchitectureAnalyzer.DotnetScanner.Scanner
             TypeReferenceHandle handle,
             byte rawTypeKind)
         {
-            return _factory.CreateTypeModel(handle.GetTypeId(reader));
+            return _factory.CreateTypeModel(handle.GetTypeKey(reader));
         }
 
         public NetType GetTypeFromSpecification(
@@ -110,21 +110,23 @@ namespace ArchitectureAnalyzer.DotnetScanner.Scanner
 
         public NetType GetSZArrayType(NetType elementType)
         {
-            return _factory.CreateTypeModel(elementType.Id + "[]");
+            return _factory.CreateTypeModel(elementType.GetKey().ToArrayType());
         }
 
         public NetType GetGenericInstantiation(NetType genericType, ImmutableArray<NetType> typeArguments)
         {
-            var id = genericType.Id + "<" + string.Join(",", typeArguments.Select(a => a.Id)) + ">";
+            var key = genericType.GetKey().ToGenericType(typeArguments.Select(t => t.GetKey()));
 
-            return _factory.CreateTypeModel(id);
+            return _factory.CreateTypeModel(key);
         }
 
         public NetType GetArrayType(NetType elementType, ArrayShape shape)
         {
             var builder = new StringBuilder();
 
-            builder.Append(elementType.Id);
+            var elementTypeKey = elementType.GetKey();
+
+            builder.Append(elementTypeKey.Name);
             builder.Append('[');
 
             for (var i = 0; i < shape.Rank; i++)
@@ -152,17 +154,17 @@ namespace ArchitectureAnalyzer.DotnetScanner.Scanner
 
             builder.Append(']');
 
-            return _factory.CreateTypeModel(builder.ToString());
+            return _factory.CreateTypeModel(new TypeKey(elementType.Namespace, builder.ToString()));
         }
 
         public NetType GetByReferenceType(NetType elementType)
         {
-            return _factory.CreateTypeModel(elementType.Id + "&");
+            return _factory.CreateTypeModel(elementType.GetKey().ToReferenceType());
         }
 
         public NetType GetPointerType(NetType elementType)
         {
-            return _factory.CreateTypeModel(elementType.Id + "*");
+            return _factory.CreateTypeModel(elementType.GetKey().ToPointerType());
         }
 
         public NetType GetFunctionPointerType(MethodSignature<NetType> signature)
@@ -172,24 +174,24 @@ namespace ArchitectureAnalyzer.DotnetScanner.Scanner
 
         public NetType GetGenericMethodParameter(object genericContext, int index)
         {
-            return _factory.CreateTypeModel("!!" + index);
+            return _factory.CreateTypeModel(new TypeKey(string.Empty, "!!" + index));
         }
 
         public NetType GetGenericTypeParameter(object genericContext, int index)
         {
-            return _factory.CreateTypeModel("!" + index);
+            return _factory.CreateTypeModel(new TypeKey(string.Empty, "!" + index));
         }
 
         public NetType GetModifiedType(NetType modifier, NetType unmodifiedType, bool isRequired)
         {
-            var id = modifier.Id + " " + unmodifiedType.Id;
+            var key = unmodifiedType.GetKey().ToModifiedType(modifier.GetKey());
 
-            return _factory.CreateTypeModel(id);
+            return _factory.CreateTypeModel(key);
         }
 
         public NetType GetPinnedType(NetType elementType)
         {
-            return _factory.CreateTypeModel(elementType.Id + " pinned");
+            return _factory.CreateTypeModel(elementType.GetKey().ToPinnedType());
         }
     }
 }

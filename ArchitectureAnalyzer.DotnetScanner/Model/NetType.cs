@@ -50,5 +50,15 @@
             Attributes = new List<NetType>();
             Methods = new List<NetMethod>();
         }
+
+        public override string ToString()
+        {
+            return $"NetType({Namespace}.{Name})";
+        }
+
+        public TypeKey GetKey()
+        {
+            return new TypeKey(Namespace, Name);
+        }
     }
 }

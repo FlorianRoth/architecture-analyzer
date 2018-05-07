@@ -16,17 +16,7 @@
         {
             _scanner = new TypeScanner(MetadataReader, ModelFactory, Logger);
         }
-
-        [Test]
-        public void IdIsCorrect()
-        {
-            var type = GetTypeDefintion(typeof(EmptyClass));
-
-            var model = _scanner.ScanType(type);
-
-            Assert.That(model.Id, Is.EqualTo(typeof(EmptyClass).FullName));
-        }
-
+        
         [Test]
         public void NameIsCorrect()
         {

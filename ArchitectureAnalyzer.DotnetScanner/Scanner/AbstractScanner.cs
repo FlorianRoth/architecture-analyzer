@@ -20,5 +20,10 @@
             Factory = factory;
             Logger = logger;
         }
+
+        protected static AssemblyKey AssemblyKey(string name)
+        {
+            return new AssemblyKey(name);
+        }
     }
 }

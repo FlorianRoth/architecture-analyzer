@@ -23,7 +23,7 @@ namespace ArchitectureAnalyzer.DotnetScanner.Scanner
         {
             var name = assembly.Name.GetString(Reader);
 
-            var assemblyModel = Factory.CreateAssemblyModel(name);
+            var assemblyModel = Factory.CreateAssemblyModel(AssemblyKey(name));
             assemblyModel.Name = name;
             
             assemblyModel.References = Reader.AssemblyReferences
@@ -49,7 +49,8 @@ namespace ArchitectureAnalyzer.DotnetScanner.Scanner
 
         private NetAssembly CreateAssemblyModel(AssemblyReference assemblyReference)
         {
-            return Factory.CreateAssemblyModel(assemblyReference.Name.GetString(Reader));
+            var key = AssemblyKey(assemblyReference.Name.GetString(Reader));
+            return Factory.CreateAssemblyModel(key);
         }
     }
 }

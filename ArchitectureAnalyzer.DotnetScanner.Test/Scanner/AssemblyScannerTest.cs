@@ -21,15 +21,7 @@
         {
             _scanner = new AssemblyScanner(MetadataReader, ModelFactory, Logger);
         }
-
-        [Test]
-        public void IdIsCorrect()
-        {
-            var assemblyModel = _scanner.Scan(Assembly);
-
-            Assert.That(assemblyModel.Id, Is.EqualTo("TestLibrary"));
-        }
-
+        
         [Test]
         public void NameIsCorrect()
         {

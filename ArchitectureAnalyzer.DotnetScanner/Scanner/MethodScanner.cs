@@ -1,6 +1,7 @@
 ﻿namespace ArchitectureAnalyzer.DotnetScanner.Scanner
 {
     using System.Collections.Generic;
+    using System.Linq;
     using System.Reflection;
     using System.Reflection.Metadata;
 
@@ -73,7 +74,9 @@
             var signatureTypeProvider = new SignatureTypeProvider(Factory);
             var signature = method.DecodeSignature(signatureTypeProvider, null);
 
-            var methodModel = Factory.CreateMethodModel(typeModel.Id + "." + name);
+            var signatureString = CreateSignatureString(name, signature);
+
+            var methodModel = Factory.CreateMethodModel(new MethodKey(name));
             methodModel.Name = name;
             methodModel.IsAbstract = IsAbstract(method);
             methodModel.IsStatic = IsStatic(method);
@@ -82,6 +85,11 @@
             methodModel.ParameterTypes = signature.ParameterTypes;
 
             return methodModel;
+        }
+
+        private object CreateSignatureString(string name, MethodSignature<NetType> signature)
+        {
+            return $"{name}({string.Join(",", signature.ParameterTypes.Select(t => t.Id))}):{signature.ReturnType.Id}";
         }
 
         private static bool IsAbstract(MethodDefinition method)

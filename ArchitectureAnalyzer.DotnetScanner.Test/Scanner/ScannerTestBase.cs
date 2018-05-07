@@ -1,8 +1,8 @@
 ﻿namespace ArchitectureAnalyzer.DotnetScanner.Test.Scanner
 {
     using System.IO;
+    using System.Linq;
 
-    using ArchitectureAnalyzer.Core.Graph;
     using ArchitectureAnalyzer.DotnetScanner.Model;
 
     using FakeItEasy;
@@ -26,19 +26,19 @@
             ModelFactory = new ModelFactory();
         }
 
-        protected static NetAssembly NetAssembly(string id)
+        protected NetAssembly NetAssembly(string name)
         {
-            return new NetAssembly { Id = id };
+            return ModelFactory.GetAssemblyModels().FirstOrDefault(a => a.Name == name);
         }
 
-        protected static NetType NetType<T>()
+        protected NetType NetType<T>()
         {
-            return new NetType { Id = typeof(T).FullName };
+            return ModelFactory.GetTypeModels().FirstOrDefault(t => t.Name == typeof(T).Name && t.Namespace == typeof(T).Namespace);
         }
 
-        protected static NetMethod NetMethod<T>(string methodName)
+        protected NetMethod NetMethod<T>(string methodName)
         {
-            return new NetMethod { Id = typeof(T).FullName + "." + methodName };
+            return ModelFactory.GetMethodModels().FirstOrDefault(m => m.Name == methodName);
         }
     }
 }

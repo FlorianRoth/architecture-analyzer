@@ -18,17 +18,7 @@
         {
             _scanner = new MethodScanner(MetadataReader, ModelFactory, Logger);
         }
-
-        [Test]
-        public void IdIsCorrect()
-        {
-            var method = GetMethodDefinition<ClassWithMembers>(nameof(ClassWithMembers.SomeMethod));
-
-            var model = _scanner.ScanMethod(method, NetType<ClassWithMembers>());
-
-            Assert.That(model.Id, Is.EqualTo(typeof(ClassWithMembers).FullName + "." + nameof(ClassWithMembers.SomeMethod)));
-        }
-
+        
         [Test]
         public void NameIsCorrect()
         {

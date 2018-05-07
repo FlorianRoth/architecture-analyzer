@@ -41,7 +41,7 @@
 
             var scannedAssemblies = ScanAssemblies();
 
-            CreateNodes();
+            CreateNodes(scannedAssemblies);
 
             foreach (var assemblyModel in scannedAssemblies)
             {
@@ -59,18 +59,54 @@
                 .ToList();
         }
 
-        private void CreateNodes()
+        private NetAssembly ScanAssembly(string assemblyPath)
         {
-            foreach (var model in _factory.GetAssemblyModels())
+            _logger.LogInformation("Scanning assembly '{0}'", assemblyPath);
+
+            try
+            {
+                using (var stream = File.OpenRead(assemblyPath))
+                using (var peFile = new PEReader(stream))
+                {
+                    var metadataReader = peFile.GetMetadataReader();
+                    var scanner = new AssemblyScanner(
+                        metadataReader,
+                        _factory,
+                        _logger);
+
+                    var assembly = metadataReader.GetAssemblyDefinition();
+                    return scanner.Scan(assembly);
+                }
+            }
+            catch (IOException ex)
+            {
+                _logger.LogError(ex, "Failed to load assembly '{0}'", assemblyPath);
+                throw;
+            }
+            catch (BadImageFormatException ex)
+            {
+                _logger.LogError(ex, "Failed to load assembly '{0}'", assemblyPath);
+                throw;
+            }
+        }
+
+        private void CreateNodes(IEnumerable<NetAssembly> scannedAssemblies)
+        {
+            _logger.LogInformation("Adding nodes to database");
+
+            _logger.LogInformation("  Creating assembly nodes");
+            foreach (var model in scannedAssemblies)
             {
                 _db.CreateNode(model);
             }
 
+            _logger.LogInformation("  Creating type nodes");
             foreach (var model in _factory.GetTypeModels())
             {
                 _db.CreateNode(model);
             }
 
+            _logger.LogInformation("  Creating method nodes");
             foreach (var model in _factory.GetMethodModels())
             {
                 _db.CreateNode(model);
@@ -151,37 +187,6 @@
             {
                 var rel = new HasParameterRelationship { Order = order++ };
                 _db.CreateRelationship(method, param, Relationship.HAS_PARAMETER, rel);
-            }
-        }
-
-        private NetAssembly ScanAssembly(string assemblyPath)
-        {
-            _logger.LogInformation("Scanning assembly '{0}'", assemblyPath);
-
-            try
-            {
-                using (var stream = File.OpenRead(assemblyPath))
-                using (var peFile = new PEReader(stream))
-                {
-                    var metadataReader = peFile.GetMetadataReader();
-                    var scanner = new AssemblyScanner(
-                        metadataReader,
-                        _factory,
-                        _logger);
-
-                    var assembly = metadataReader.GetAssemblyDefinition();
-                    return scanner.Scan(assembly);
-                }
-            }
-            catch (IOException ex)
-            {
-                _logger.LogError(ex, "Failed to load assembly '{0}'", assemblyPath);
-                throw;
-            }
-            catch (BadImageFormatException ex)
-            {
-                _logger.LogError(ex, "Failed to load assembly '{0}'", assemblyPath);
-                throw;
             }
         }
     }

@@ -1,46 +1,42 @@
 ﻿
 namespace ArchitectureAnalyzer.DotnetScanner.Utils
 {
-    using System.Linq;
     using System.Reflection.Metadata;
+
+    using ArchitectureAnalyzer.DotnetScanner.Model;
 
     internal static class MetadataExtensions
     {
-        public static string GetTypeId(this TypeDefinitionHandle typeDef, MetadataReader reader)
+        public static TypeKey GetTypeKey(this TypeDefinitionHandle typeDef, MetadataReader reader)
         {
             if (typeDef.IsNil)
             {
-                return null;
+                return TypeKey.Undefined;
             }
             
-            return GetTypeId(reader.GetTypeDefinition(typeDef), reader);
+            return GetTypeKey(reader.GetTypeDefinition(typeDef), reader);
         }
 
-        public static string GetTypeId(this TypeDefinition typeDef, MetadataReader reader)
+        public static TypeKey GetTypeKey(this TypeDefinition typeDef, MetadataReader reader)
         {
-            return CreateId(reader, typeDef.Namespace, typeDef.Name);
+            return new TypeKey(typeDef.Namespace.GetString(reader), typeDef.Name.GetString(reader));
         }
 
-        public static string GetTypeId(this TypeReferenceHandle typeRef, MetadataReader reader)
+        public static TypeKey GetTypeKey(this TypeReferenceHandle typeRef, MetadataReader reader)
         {
             if (typeRef.IsNil)
             {
-                return null;
+                return TypeKey.Undefined;
             }
 
-            return GetTypeId(reader.GetTypeReference(typeRef), reader);
+            return GetTypeKey(reader.GetTypeReference(typeRef), reader);
         }
 
-        public static string GetTypeId(this TypeReference typeRef, MetadataReader reader)
+        public static TypeKey GetTypeKey(this TypeReference typeRef, MetadataReader reader)
         {
-            return CreateId(reader, typeRef.Namespace, typeRef.Name);
+            return new TypeKey(typeRef.Namespace.GetString(reader), typeRef.Name.GetString(reader));
         }
-
-        private static string CreateId(MetadataReader reader, params StringHandle[] parts)
-        {
-            return string.Join(".", parts.Select(h => GetString(h, reader)).Where(s => !string.IsNullOrEmpty(s)));
-        }
-
+        
         public static string GetString(this StringHandle handle, MetadataReader reader)
         {
             return handle.IsNil ? null : reader.GetString(handle);
