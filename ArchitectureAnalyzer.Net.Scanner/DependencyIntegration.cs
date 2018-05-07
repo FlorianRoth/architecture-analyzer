@@ -4,8 +4,8 @@ namespace ArchitectureAnalyzer.DotnetScanner
     using System;
 
     using ArchitectureAnalyzer.Core.Scanner;
-    using ArchitectureAnalyzer.DotnetScanner.Model;
-    using ArchitectureAnalyzer.DotnetScanner.Scanner;
+    using ArchitectureAnalyzer.Net.Scanner;
+    using ArchitectureAnalyzer.Net.Scanner.Model;
 
     using Microsoft.Extensions.DependencyInjection;
 

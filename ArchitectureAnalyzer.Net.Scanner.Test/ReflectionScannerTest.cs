@@ -1,7 +1,6 @@
-﻿namespace ArchitectureAnalyzer.DotnetScanner.Test.Scanner
+﻿namespace ArchitectureAnalyzer.Net.Scanner.Test
 {
     using ArchitectureAnalyzer.Core.Graph;
-    using ArchitectureAnalyzer.DotnetScanner.Scanner;
 
     using FakeItEasy;
 

@@ -1,5 +1,5 @@
 ﻿
-namespace ArchitectureAnalyzer.DotnetScanner.Scanner
+namespace ArchitectureAnalyzer.Net.Scanner
 {
     public static class Relationship
     {

@@ -1,17 +1,17 @@
-﻿namespace ArchitectureAnalyzer.DotnetScanner.Test.Scanner
+﻿namespace ArchitectureAnalyzer.Net.Scanner.Test
 {
     using System.IO;
     using System.Linq;
 
-    using ArchitectureAnalyzer.DotnetScanner.Model;
     using ArchitectureAnalyzer.Net.Model;
+    using ArchitectureAnalyzer.Net.Scanner.Model;
 
     using FakeItEasy;
 
     using Microsoft.Extensions.Logging;
 
     using NUnit.Framework;
-    
+
     public abstract class ScannerTestBase
     {
         protected ILogger Logger { get; private set; }

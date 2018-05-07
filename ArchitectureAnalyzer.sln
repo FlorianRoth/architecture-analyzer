@@ -5,13 +5,13 @@ VisualStudioVersion = 15.0.27130.2036
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ArchitectureAnalyzer", "ArchitectureAnalyzer\ArchitectureAnalyzer.csproj", "{A0290A23-3D87-4DA9-A7FA-4FF60C07467C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ArchitectureAnalyzer.DotnetScanner", "ArchitectureAnalyzer.DotnetScanner\ArchitectureAnalyzer.DotnetScanner.csproj", "{31E4D3B8-6229-45A1-A054-EEBBC9D8DE3F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ArchitectureAnalyzer.Net.Scanner", "ArchitectureAnalyzer.Net.Scanner\ArchitectureAnalyzer.Net.Scanner.csproj", "{31E4D3B8-6229-45A1-A054-EEBBC9D8DE3F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ArchitectureAnalyzer.Core", "ArchitectureAnalyzer.Core\ArchitectureAnalyzer.Core.csproj", "{E9722C45-0522-4355-BDF4-AC2E9FDE5CC6}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ArchitectureAnalyzer.Neo4j", "ArchitectureAnalyzer.Neo4j\ArchitectureAnalyzer.Neo4j.csproj", "{A1C91CA6-D305-4734-B389-67B80A42C91D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ArchitectureAnalyzer.DotnetScanner.Test", "ArchitectureAnalyzer.DotnetScanner.Test\ArchitectureAnalyzer.DotnetScanner.Test.csproj", "{51A2C7B8-3DEB-4D27-8C80-A02E8D13BD19}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ArchitectureAnalyzer.Net.Scanner.Test", "ArchitectureAnalyzer.Net.Scanner.Test\ArchitectureAnalyzer.Net.Scanner.Test.csproj", "{51A2C7B8-3DEB-4D27-8C80-A02E8D13BD19}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestLibrary", "TestLibrary\TestLibrary.csproj", "{93AE81AC-EF7B-4C16-A3F3-8A0FD1E7B177}"
 EndProject

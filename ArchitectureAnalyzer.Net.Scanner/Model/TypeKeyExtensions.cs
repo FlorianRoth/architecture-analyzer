@@ -1,5 +1,5 @@
 ﻿
-namespace ArchitectureAnalyzer.DotnetScanner.Model
+namespace ArchitectureAnalyzer.Net.Scanner.Model
 {
     using System.Collections.Generic;
     using System.Linq;

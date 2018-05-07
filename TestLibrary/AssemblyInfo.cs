@@ -1,3 +1,3 @@
 ﻿using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("ArchitectureAnalyzer.DotnetScanner.Test")]
+[assembly: InternalsVisibleTo("ArchitectureAnalyzer.Net.Scanner.Test")]

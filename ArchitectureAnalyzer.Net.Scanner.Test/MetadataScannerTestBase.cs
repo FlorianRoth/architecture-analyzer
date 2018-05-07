@@ -1,4 +1,4 @@
-﻿namespace ArchitectureAnalyzer.DotnetScanner.Test.Scanner
+﻿namespace ArchitectureAnalyzer.Net.Scanner.Test
 {
     using System;
     using System.IO;
@@ -7,7 +7,7 @@
     using System.Reflection.PortableExecutable;
 
     using NUnit.Framework;
-    
+
     public abstract class MetadataScannerTestBase : ScannerTestBase
     {
         private FileStream _stream;

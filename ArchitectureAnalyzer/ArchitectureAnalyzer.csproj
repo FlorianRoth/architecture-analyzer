@@ -18,8 +18,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ArchitectureAnalyzer.Core\ArchitectureAnalyzer.Core.csproj" />
-    <ProjectReference Include="..\ArchitectureAnalyzer.DotnetScanner\ArchitectureAnalyzer.DotnetScanner.csproj" />
     <ProjectReference Include="..\ArchitectureAnalyzer.Neo4j\ArchitectureAnalyzer.Neo4j.csproj" />
+    <ProjectReference Include="..\ArchitectureAnalyzer.Net.Model\ArchitectureAnalyzer.Net.Model.csproj" />
+    <ProjectReference Include="..\ArchitectureAnalyzer.Net.Scanner\ArchitectureAnalyzer.Net.Scanner.csproj" />
   </ItemGroup>
 
   <ItemGroup>

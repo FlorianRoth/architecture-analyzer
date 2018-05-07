@@ -1,5 +1,5 @@
 ﻿
-namespace ArchitectureAnalyzer.DotnetScanner.Scanner
+namespace ArchitectureAnalyzer.Net.Scanner
 {
     using System;
     using System.Collections.Immutable;
@@ -7,9 +7,9 @@ namespace ArchitectureAnalyzer.DotnetScanner.Scanner
     using System.Reflection.Metadata;
     using System.Text;
 
-    using ArchitectureAnalyzer.DotnetScanner.Model;
-    using ArchitectureAnalyzer.DotnetScanner.Utils;
     using ArchitectureAnalyzer.Net.Model;
+    using ArchitectureAnalyzer.Net.Scanner.Model;
+    using ArchitectureAnalyzer.Net.Scanner.Utils;
 
     internal class SignatureTypeProvider : ISignatureTypeProvider<NetType, object>
     {
@@ -116,7 +116,7 @@ namespace ArchitectureAnalyzer.DotnetScanner.Scanner
 
         public NetType GetGenericInstantiation(NetType genericType, ImmutableArray<NetType> typeArguments)
         {
-            var key = genericType.GetKey().ToGenericType(typeArguments.Select(t => t.GetKey()));
+            var key = genericType.GetKey().ToGenericType(typeArguments.Select(t => TypeKeyExtensions.GetKey(t)));
 
             return _factory.CreateTypeModel(key);
         }

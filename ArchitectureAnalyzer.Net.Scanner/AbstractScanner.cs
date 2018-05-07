@@ -1,8 +1,8 @@
-﻿namespace ArchitectureAnalyzer.DotnetScanner.Scanner
+﻿namespace ArchitectureAnalyzer.Net.Scanner
 {
     using System.Reflection.Metadata;
-    
-    using ArchitectureAnalyzer.DotnetScanner.Model;
+
+    using ArchitectureAnalyzer.Net.Scanner.Model;
 
     using Microsoft.Extensions.Logging;
 

@@ -1,4 +1,4 @@
-﻿namespace ArchitectureAnalyzer.DotnetScanner.Scanner
+﻿namespace ArchitectureAnalyzer.Net.Scanner
 {
     using System;
     using System.Collections.Generic;
@@ -9,8 +9,8 @@
 
     using ArchitectureAnalyzer.Core.Graph;
     using ArchitectureAnalyzer.Core.Scanner;
-    using ArchitectureAnalyzer.DotnetScanner.Model;
     using ArchitectureAnalyzer.Net.Model;
+    using ArchitectureAnalyzer.Net.Scanner.Model;
 
     using Microsoft.Extensions.Logging;
 

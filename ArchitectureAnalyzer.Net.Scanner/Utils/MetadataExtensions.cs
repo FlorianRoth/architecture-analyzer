@@ -1,9 +1,9 @@
 ﻿
-namespace ArchitectureAnalyzer.DotnetScanner.Utils
+namespace ArchitectureAnalyzer.Net.Scanner.Utils
 {
     using System.Reflection.Metadata;
 
-    using ArchitectureAnalyzer.DotnetScanner.Model;
+    using ArchitectureAnalyzer.Net.Scanner.Model;
 
     internal static class MetadataExtensions
     {

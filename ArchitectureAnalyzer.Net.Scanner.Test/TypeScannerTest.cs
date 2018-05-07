@@ -1,7 +1,5 @@
-﻿namespace ArchitectureAnalyzer.DotnetScanner.Test.Scanner
+﻿namespace ArchitectureAnalyzer.Net.Scanner.Test
 {
-    using ArchitectureAnalyzer.DotnetScanner.Scanner;
-
     using NUnit.Framework;
 
     using TestLibrary;

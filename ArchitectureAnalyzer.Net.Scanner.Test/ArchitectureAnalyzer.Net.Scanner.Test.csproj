@@ -6,6 +6,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Scanner\**" />
+    <EmbeddedResource Remove="Scanner\**" />
+    <None Remove="Scanner\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="FakeItEasy" Version="4.5.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.7.0" />
     <PackageReference Include="NUnit" Version="3.10.1" />
@@ -13,8 +19,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ArchitectureAnalyzer.DotnetScanner\ArchitectureAnalyzer.DotnetScanner.csproj" />
     <ProjectReference Include="..\ArchitectureAnalyzer.Net.Model\ArchitectureAnalyzer.Net.Model.csproj" />
+    <ProjectReference Include="..\ArchitectureAnalyzer.Net.Scanner\ArchitectureAnalyzer.Net.Scanner.csproj" />
     <ProjectReference Include="..\TestLibrary\TestLibrary.csproj" />
   </ItemGroup>
 
