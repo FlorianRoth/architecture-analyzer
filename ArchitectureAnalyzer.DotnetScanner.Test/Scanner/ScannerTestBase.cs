@@ -15,8 +15,6 @@
     {
         protected ILogger Logger { get; private set; }
 
-        protected IGraphDatabase Database { get; private set; }
-
         protected IModelFactory ModelFactory { get; private set; }
 
         protected string AssemblyPath =>  Path.Combine(TestContext.CurrentContext.TestDirectory, "TestLibrary.dll");
@@ -25,38 +23,7 @@
         public void SetUp()
         {
             Logger = A.Fake<ILogger>();
-            Database = A.Fake<IGraphDatabase>();
             ModelFactory = new ModelFactory();
-        }
-        
-        protected void AssertCreateTypeNode<T>()
-        {
-            A.CallTo(() => Database.CreateNode(NetType<T>())).MustHaveHappened(Repeated.Exactly.Once);
-        }
-
-        protected void AssertNoTypeNode<T>()
-        {
-            A.CallTo(() => Database.CreateNode(NetType<T>())).MustNotHaveHappened();
-        }
-
-        protected void AssertCreateMethodNode<T>(string methodName)
-        {
-            A.CallTo(() => Database.CreateNode(NetMethod<T>(methodName))).MustHaveHappened(Repeated.Exactly.Once);
-        }
-
-        protected void AssertNoMethodNode<T>(string methodName)
-        {
-            A.CallTo(() => Database.CreateNode(NetMethod<T>(methodName))).MustNotHaveHappened();
-        }
-
-        protected void AssertTypeRelationShip<TFrom, TTo>(string relationship)
-        {
-            A.CallTo(() => Database.CreateRelationship(NetType<TFrom>(), NetType<TTo>(), relationship)).MustHaveHappened(Repeated.Exactly.Once);
-        }
-
-        protected void AssertNoTypeRelationShip<TFrom, TTo>(string relationship)
-        {
-            A.CallTo(() => Database.CreateRelationship(NetType<TFrom>(), NetType<TTo>(), relationship)).MustNotHaveHappened();
         }
 
         protected static NetAssembly NetAssembly(string id)

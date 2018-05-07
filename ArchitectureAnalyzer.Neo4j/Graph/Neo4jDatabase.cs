@@ -5,7 +5,7 @@
     using Microsoft.Extensions.Logging;
 
     using Neo4jClient;
-
+    
     internal class Neo4jDatabase : IGraphDatabase
     {
         private readonly ILogger<Neo4jDatabase> _logger;
@@ -70,11 +70,29 @@
             var fromId = fromNode.Id;
             var toId = toNode.Id;
 
-           _client.Cypher
+            _client.Cypher
                 .Match($"(from:{fromLabel})", $"(to:{toLabel})")
                 .Where((TFrom from) => from.Id == fromId)
                 .AndWhere((TTo to) => to.Id == toId)
                 .Create($"(from)-[:{relationType}]->(to)")
+                .ExecuteWithoutResults();
+        }
+
+        public void CreateRelationship<TFrom, TTo, TRel>(TFrom fromNode, TTo toNode, string relationType, TRel relationshipProperties)
+            where TFrom : Node where TTo : Node
+        {
+            var fromLabel = typeof(TFrom).Name;
+            var toLabel = typeof(TTo).Name;
+
+            var fromId = fromNode.Id;
+            var toId = toNode.Id;
+
+            _client.Cypher
+                .Match($"(from:{fromLabel})", $"(to:{toLabel})")
+                .Where((TFrom from) => from.Id == fromId)
+                .AndWhere((TTo to) => to.Id == toId)
+                .Create($"(from)-[:{relationType} {{rel}}]->(to)")
+                .WithParam("rel", relationshipProperties)
                 .ExecuteWithoutResults();
         }
     }

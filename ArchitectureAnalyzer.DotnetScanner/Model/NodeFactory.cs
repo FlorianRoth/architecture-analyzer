@@ -26,7 +26,10 @@
 
         public NetType CreateTypeModel(string id)
         {
-            return _typeMap.Get(id);
+            var model = _typeMap.Get(id);
+            model.Name = id.Substring(id.LastIndexOf('.') + 1);
+
+            return model;
         }
         
         public NetMethod CreateMethodModel(string id)
@@ -34,9 +37,26 @@
             return _methodMap.Get(id);
         }
 
+        public IEnumerable<NetAssembly> GetAssemblyModels()
+        {
+            return _assemblyMap.Models;
+        }
+
+        public IEnumerable<NetType> GetTypeModels()
+        {
+            return _typeMap.Models;
+        }
+
+        public IEnumerable<NetMethod> GetMethodModels()
+        {
+            return _methodMap.Models;
+        }
+
         private class ModelMap<TNode> where TNode : Node, new()
         {
             private readonly IDictionary<string, TNode> _nodeMap;
+
+            public IEnumerable<TNode> Models => _nodeMap.Values;
 
             public ModelMap()
             {

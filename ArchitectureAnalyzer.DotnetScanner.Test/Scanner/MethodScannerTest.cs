@@ -1,5 +1,7 @@
 ﻿namespace ArchitectureAnalyzer.DotnetScanner.Test.Scanner
 {
+    using System;
+
     using ArchitectureAnalyzer.DotnetScanner.Scanner;
 
     using NUnit.Framework;
@@ -14,78 +16,52 @@
         [SetUp]
         public void SetupScanner()
         {
-            _scanner = new MethodScanner(MetadataReader, ModelFactory, Database, Logger);
+            _scanner = new MethodScanner(MetadataReader, ModelFactory, Logger);
         }
 
         [Test]
-        public void PublicMethodIsAddedToDatabase()
+        public void IdIsCorrect()
         {
             var method = GetMethodDefinition<ClassWithMembers>(nameof(ClassWithMembers.SomeMethod));
 
-            _scanner.ScanMethod(method, NetType<ClassWithMembers>());
+            var model = _scanner.ScanMethod(method, NetType<ClassWithMembers>());
 
-            AssertCreateMethodNode<ClassWithMembers>(nameof(ClassWithMembers.SomeMethod));
+            Assert.That(model.Id, Is.EqualTo(typeof(ClassWithMembers).FullName + "." + nameof(ClassWithMembers.SomeMethod)));
         }
 
         [Test]
-        public void InternalMethodIsNotAddedToDatabase()
+        public void NameIsCorrect()
         {
-            var method = GetMethodDefinition<ClassWithMembers>(nameof(ClassWithMembers.InternalMethod));
+            var method = GetMethodDefinition<ClassWithMembers>(nameof(ClassWithMembers.SomeMethod));
 
-            _scanner.ScanMethod(method, NetType<ClassWithMembers>());
+            var model = _scanner.ScanMethod(method, NetType<ClassWithMembers>());
 
-            AssertNoMethodNode<ClassWithMembers>(nameof(ClassWithMembers.InternalMethod));
+            Assert.That(model.Name, Is.EqualTo(nameof(ClassWithMembers.SomeMethod)));
         }
 
         [Test]
-        public void ConstructorIsAddedToDatabase()
+        public void ReturnTypeIsCorrect()
         {
-            var methodName = ".ctor";
+            var method = GetMethodDefinition<ClassWithMembers>(nameof(ClassWithMembers.IntMethod));
 
-            var method = GetMethodDefinition<InheritedFromClassWithMembers>(methodName);
+            var model = _scanner.ScanMethod(method, NetType<ClassWithMembers>());
 
-            _scanner.ScanMethod(method, NetType<InheritedFromClassWithMembers>());
-
-            AssertCreateMethodNode<InheritedFromClassWithMembers>(methodName);
+            Assert.That(model.ReturnType.Name, Is.EqualTo(nameof(Int32)));
         }
 
-        [TestCase("get_")]
-        [TestCase("set_")]
-        public void PropertyAccessorIsNotAddedToDatabase(string accessor)
+        [Test]
+        public void ParamterTypesAreCorrect()
         {
-            var methodName = accessor + nameof(ClassWithMembers.Property);
+            var method = GetMethodDefinition<ClassWithMembers>(nameof(ClassWithMembers.MethodWithParams));
 
-            var method = GetMethodDefinition<ClassWithMembers>(methodName);
+            var model = _scanner.ScanMethod(method, NetType<ClassWithMembers>());
+            
+            Assert.That(model.ParameterTypes.Count, Is.EqualTo(2));
 
-            _scanner.ScanMethod(method, NetType<ClassWithMembers>());
-
-            AssertNoMethodNode<ClassWithMembers>(methodName);
+            Assert.That(model.ParameterTypes[0].Name, Is.EqualTo(nameof(Int32)));
+            Assert.That(model.ParameterTypes[1].Name, Is.EqualTo(nameof(String)));
         }
 
-        [TestCase("add_")]
-        [TestCase("remove_")]
-        public void EventAccessorIsNotAddedToDatabase(string accessor)
-        {
-            var methodName = accessor + nameof(ClassWithMembers.Event);
-
-            var method = GetMethodDefinition<ClassWithMembers>(methodName);
-
-            _scanner.ScanMethod(method, NetType<ClassWithMembers>());
-
-            AssertNoMethodNode<ClassWithMembers>(methodName);
-        }
-
-        [TestCase("op_Equality")]
-        [TestCase("op_Inequality")]
-        public void OperatorIsAddedToDatabase(string methodName)
-        {
-            var method = GetMethodDefinition<ClassWithMembers>(methodName);
-
-            _scanner.ScanMethod(method, NetType<ClassWithMembers>());
-
-            AssertCreateMethodNode<ClassWithMembers>(methodName);
-        }
-        
         [Test]
         public void IsStaticFlagIsSetForStaticMethod()
         {
@@ -109,8 +85,7 @@
             Assert.That(model.IsAbstract, Is.True);
             Assert.That(model.IsSealed, Is.False);
         }
-
-
+        
         [Test]
         public void IsSealedFlagIsSetForSealedMethod()
         {

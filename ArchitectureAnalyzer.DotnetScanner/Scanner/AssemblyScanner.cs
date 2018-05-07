@@ -4,8 +4,8 @@ namespace ArchitectureAnalyzer.DotnetScanner.Scanner
     using System.Linq;
     using System.Reflection.Metadata;
 
-    using ArchitectureAnalyzer.Core.Graph;
     using ArchitectureAnalyzer.DotnetScanner.Model;
+    using ArchitectureAnalyzer.DotnetScanner.Utils;
 
     using Microsoft.Extensions.Logging;
 
@@ -14,27 +14,24 @@ namespace ArchitectureAnalyzer.DotnetScanner.Scanner
         public AssemblyScanner(
             MetadataReader reader,
             IModelFactory factory,
-            IGraphDatabase database,
             ILogger logger)
-            : base(reader, factory, database, logger)
+            : base(reader, factory, logger)
         {
         }
 
         public NetAssembly Scan(AssemblyDefinition assembly)
         {
-            var name = GetString(assembly.Name);
+            var name = assembly.Name.GetString(Reader);
 
-            var model = Factory.CreateAssemblyModel(name);
-            model.Name = name;
-
-            Database.CreateNode(model);
-
-            model.References = Reader.AssemblyReferences
+            var assemblyModel = Factory.CreateAssemblyModel(name);
+            assemblyModel.Name = name;
+            
+            assemblyModel.References = Reader.AssemblyReferences
                 .Select(Reader.GetAssemblyReference)
                 .Select(CreateAssemblyModel)
                 .ToList();
             
-            var typeScanner = new TypeScanner(Reader, Factory, Database, Logger);
+            var typeScanner = new TypeScanner(Reader, Factory, Logger);
 
             foreach (var type in Reader.TypeDefinitions.Select(Reader.GetTypeDefinition))
             {
@@ -44,16 +41,15 @@ namespace ArchitectureAnalyzer.DotnetScanner.Scanner
                     continue;
                 }
                 
-                model.DefinedTypes.Add(typeModel);
-                Database.CreateRelationship(model, typeModel, Relationship.DEFINES_TYPE);
+                assemblyModel.DefinedTypes.Add(typeModel);
             }
 
-            return model;
+            return assemblyModel;
         }
 
         private NetAssembly CreateAssemblyModel(AssemblyReference assemblyReference)
         {
-            return Factory.CreateAssemblyModel(GetString(assemblyReference.Name));
+            return Factory.CreateAssemblyModel(assemblyReference.Name.GetString(Reader));
         }
     }
 }

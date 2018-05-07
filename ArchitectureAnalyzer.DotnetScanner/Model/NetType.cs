@@ -11,6 +11,7 @@
     {
         public enum TypeClass
         {
+            External,
             Class,
             Interface,
             Enum
@@ -40,10 +41,14 @@
         [JsonIgnore]
         public IList<NetType> Attributes { get; set; }
 
+        [JsonIgnore]
+        public IList<NetMethod> Methods { get; set; }
+
         public NetType()
         {
             Implements = new List<NetType>();
             Attributes = new List<NetType>();
+            Methods = new List<NetMethod>();
         }
     }
 }

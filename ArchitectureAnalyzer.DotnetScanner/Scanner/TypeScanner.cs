@@ -5,56 +5,54 @@
     using System.Reflection;
     using System.Reflection.Metadata;
 
-    using ArchitectureAnalyzer.Core.Graph;
     using ArchitectureAnalyzer.DotnetScanner.Model;
+    using ArchitectureAnalyzer.DotnetScanner.Utils;
 
     using Microsoft.Extensions.Logging;
 
     internal class TypeScanner : AbstractScanner
     {
-        public TypeScanner(MetadataReader reader, IModelFactory factory, IGraphDatabase database, ILogger logger)
-            : base(reader, factory, database, logger)
+        public TypeScanner(MetadataReader reader, IModelFactory factory, ILogger logger)
+            : base(reader, factory, logger)
         {
         }
 
         public NetType ScanType(TypeDefinition type)
         {
-            Logger.LogTrace("  Scanning type '{0}'", GetString(type.Name));
+            Logger.LogTrace("  Scanning type '{0}'", type.Name.GetString(Reader));
 
             if (IncludeType(type) == false)
             {
                 return null;
             }
 
-            var model = Factory.CreateTypeModel(GetTypeId(type));
-            model.Type = GetTypeClass(type);
-            model.Name = GetString(type.Name);
-            model.Namespace = GetString(type.Namespace);
-            model.IsStatic = IsStatic(type);
-            model.IsAbstract = IsAbstract(type);
-            model.IsSealed = IsSealed(type);
-            model.HasAttribute = HasAttribute(type);
+            var typeModel = Factory.CreateTypeModel(type.GetTypeId(Reader));
+            typeModel.Type = GetTypeClass(type);
+            typeModel.Name = type.Name.GetString(Reader);
+            typeModel.Namespace = type.Namespace.GetString(Reader);
+            typeModel.IsStatic = IsStatic(type);
+            typeModel.IsAbstract = IsAbstract(type);
+            typeModel.IsSealed = IsSealed(type);
+            typeModel.HasAttribute = HasAttribute(type);
 
-            Database.CreateNode(model);
+            SetBaseType(type, typeModel);
+            SetImplementedInterfaces(type, typeModel);
+            SetAttributes(type, typeModel);
 
-            SetBaseType(type, model);
-            SetImplementedInterfaces(type, model);
-            SetAttributes(type, model);
-
-            var methodScanner = new MethodScanner(Reader, Factory, Database, Logger);
+            var methodScanner = new MethodScanner(Reader, Factory, Logger);
             foreach (var method in type.GetMethods().Select(Reader.GetMethodDefinition))
             {
-                var methodModel = methodScanner.ScanMethod(method, model);
+               var methodModel =  methodScanner.ScanMethod(method, typeModel);
 
                 if (methodModel == null)
                 {
                     continue;
                 }
 
-                Database.CreateRelationship(model, methodModel, Relationship.DEFINES_METHOD);
+                typeModel.Methods.Add(methodModel);
             }
 
-            return model;
+            return typeModel;
         }
 
         private NetType.TypeClass GetTypeClass(TypeDefinition type)
@@ -181,13 +179,13 @@
 
         private NetType GetTypeFromTypeReferenceHandle(TypeReferenceHandle handle)
         {
-            var id = GetTypeId(Reader.GetTypeReference(handle));
+            var id = Reader.GetTypeReference(handle).GetTypeId(Reader);
             return Factory.CreateTypeModel(id);
         }
 
         private NetType GetTypeFromTypeDefinitonHandle(TypeDefinitionHandle handle)
         {
-            var id = GetTypeId(Reader.GetTypeDefinition(handle));
+            var id = Reader.GetTypeDefinition(handle).GetTypeId(Reader);
             return Factory.CreateTypeModel(id);
         }
 
@@ -203,7 +201,7 @@
                 return false;
             }
 
-            var name = GetString(type.Name);
+            var name = type.Name.GetString(Reader);
             if (name.StartsWith("<"))
             {
                 return false;

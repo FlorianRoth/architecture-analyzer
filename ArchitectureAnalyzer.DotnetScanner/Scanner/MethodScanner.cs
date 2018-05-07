@@ -4,8 +4,8 @@
     using System.Reflection;
     using System.Reflection.Metadata;
 
-    using ArchitectureAnalyzer.Core.Graph;
     using ArchitectureAnalyzer.DotnetScanner.Model;
+    using ArchitectureAnalyzer.DotnetScanner.Utils;
 
     using Microsoft.Extensions.Logging;
 
@@ -55,31 +55,33 @@
                     "op_OnesComplement"
                 };
 
-        public MethodScanner(MetadataReader reader, IModelFactory factory, IGraphDatabase database, ILogger logger)
-            : base(reader, factory, database, logger)
+        public MethodScanner(MetadataReader reader, IModelFactory factory, ILogger logger)
+            : base(reader, factory, logger)
         {
         }
 
         public NetMethod ScanMethod(MethodDefinition method, NetType typeModel)
         {
-            Logger.LogTrace("    Scanning method '{0}'", GetString(method.Name));
+            Logger.LogTrace("    Scanning method '{0}'", method.Name.GetString(Reader));
 
             if (IncludeMethod(method) == false)
             {
                 return null;
             }
 
-            var name = GetString(method.Name);
+            var name = method.Name.GetString(Reader);
+            var signatureTypeProvider = new SignatureTypeProvider(Factory);
+            var signature = method.DecodeSignature(signatureTypeProvider, null);
 
-            var model = Factory.CreateMethodModel(typeModel.Id + "." + name);
-            model.Name = name;
-            model.IsAbstract = IsAbstract(method);
-            model.IsStatic = IsStatic(method);
-            model.IsSealed = IsSealed(method);
+            var methodModel = Factory.CreateMethodModel(typeModel.Id + "." + name);
+            methodModel.Name = name;
+            methodModel.IsAbstract = IsAbstract(method);
+            methodModel.IsStatic = IsStatic(method);
+            methodModel.IsSealed = IsSealed(method);
+            methodModel.ReturnType = signature.ReturnType;
+            methodModel.ParameterTypes = signature.ParameterTypes;
 
-            Database.CreateNode(model);
-
-            return model;
+            return methodModel;
         }
 
         private static bool IsAbstract(MethodDefinition method)
@@ -104,13 +106,13 @@
                 return false;
             }
 
-            var name = GetString(method.Name);
+            var name = method.Name.GetString(Reader);
             if (SpecialNames.Contains(name))
             {
                 return true;
             }
 
-            if ((method.Attributes & MethodAttributes.SpecialName) != 0)
+            if (method.Attributes.HasFlag(MethodAttributes.SpecialName))
             {
                 return false;
             }

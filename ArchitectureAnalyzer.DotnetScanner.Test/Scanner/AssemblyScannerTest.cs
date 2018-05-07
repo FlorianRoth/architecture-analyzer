@@ -1,10 +1,9 @@
 ﻿namespace ArchitectureAnalyzer.DotnetScanner.Test.Scanner
 {
+    using System.Linq;
     using System.Reflection.Metadata;
 
     using ArchitectureAnalyzer.DotnetScanner.Scanner;
-
-    using FakeItEasy;
 
     using NUnit.Framework;
 
@@ -20,15 +19,48 @@
         [SetUp]
         public void SetupScanner()
         {
-            _scanner = new AssemblyScanner(MetadataReader, ModelFactory, Database, Logger);
+            _scanner = new AssemblyScanner(MetadataReader, ModelFactory, Logger);
         }
 
         [Test]
-        public void AssemblyIsAddedToDatabase()
+        public void IdIsCorrect()
         {
-            _scanner.Scan(Assembly);
+            var assemblyModel = _scanner.Scan(Assembly);
+
+            Assert.That(assemblyModel.Id, Is.EqualTo("TestLibrary"));
+        }
+
+        [Test]
+        public void NameIsCorrect()
+        {
+            var assemblyModel = _scanner.Scan(Assembly);
             
-            A.CallTo(() => Database.CreateNode(NetAssembly("TestLibrary"))).MustHaveHappened(Repeated.Exactly.Once);
+            Assert.That(assemblyModel.Name, Is.EqualTo("TestLibrary"));
+        }
+
+        [Test]
+        public void DefinedTypesAreCorrect()
+        {
+            var assemblyModel = _scanner.Scan(Assembly);
+
+            var expectedTypes = new[]
+                                    {
+                                        nameof(AbstractClass),
+                                        nameof(ClassWithMembers),
+                                        nameof(EmptyClass),
+                                        nameof(IAgainExtendedInterface),
+                                        nameof(IExtendedInterface),
+                                        nameof(IInterface),
+                                        nameof(ImplementsInterface),
+                                        nameof(InheritedClass),
+                                        nameof(InheritedFromClassWithMembers),
+                                        nameof(InheritsInterfaceFromBaseClass),
+                                        nameof(SealedClass),
+                                        nameof(SomeEnum),
+                                        nameof(StaticClass)
+                                    };
+
+            Assert.That(assemblyModel.DefinedTypes.Select(t => t.Name), Is.EquivalentTo(expectedTypes));
         }
     }
 }

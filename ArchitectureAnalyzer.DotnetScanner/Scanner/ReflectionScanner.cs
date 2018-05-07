@@ -39,15 +39,42 @@
         {
             _logger.LogInformation("Starting scan");
 
-            var allAssemblies = _assemblies.Select(ScanAssembly).ToList();
+            var scannedAssemblies = ScanAssemblies();
 
-            foreach (var assembly in allAssemblies)
+            CreateNodes();
+
+            foreach (var assemblyModel in scannedAssemblies)
             {
-                ConnectAssemblyReferences(assembly);
-                ConnectTypes(assembly);
+                ConnectAssemblyReferences(assemblyModel);
+                ConnectTypes(assemblyModel);
             }
             
             _logger.LogInformation("Scan complete");
+        }
+
+        private IEnumerable<NetAssembly> ScanAssemblies()
+        {
+            return _assemblies
+                .Select(ScanAssembly)
+                .ToList();
+        }
+
+        private void CreateNodes()
+        {
+            foreach (var model in _factory.GetAssemblyModels())
+            {
+                _db.CreateNode(model);
+            }
+
+            foreach (var model in _factory.GetTypeModels())
+            {
+                _db.CreateNode(model);
+            }
+
+            foreach (var model in _factory.GetMethodModels())
+            {
+                _db.CreateNode(model);
+            }
         }
 
         private void ConnectAssemblyReferences(NetAssembly assembly)
@@ -66,10 +93,17 @@
 
             foreach (var type in assembly.DefinedTypes)
             {
+                ConnectTypeDefinitions(assembly, type);
                 ConnectBaseType(type);
                 ConnectInterfaceImplementations(type);
+                ConnectMethods(type);
                 ConnectAttributes(type);
             }
+        }
+
+        private void ConnectTypeDefinitions(NetAssembly assembly, NetType type)
+        {
+            _db.CreateRelationship(assembly, type, Relationship.DEFINES_TYPE);
         }
 
         private void ConnectBaseType(NetType type)
@@ -99,6 +133,27 @@
             }
         }
 
+        private void ConnectMethods(NetType type)
+        {
+            foreach (var method in type.Methods)
+            {
+                ConnectMethod(type, method);
+            }
+        }
+
+        private void ConnectMethod(NetType type, NetMethod method)
+        {
+            _db.CreateRelationship(type, method, Relationship.DEFINES_METHOD);
+            _db.CreateRelationship(method, method.ReturnType, Relationship.RETURNS);
+
+            var order = 0;
+            foreach (var param in method.ParameterTypes)
+            {
+                var rel = new HasParameterRelationship { Order = order++ };
+                _db.CreateRelationship(method, param, Relationship.HAS_PARAMETER, rel);
+            }
+        }
+
         private NetAssembly ScanAssembly(string assemblyPath)
         {
             _logger.LogInformation("Scanning assembly '{0}'", assemblyPath);
@@ -112,7 +167,6 @@
                     var scanner = new AssemblyScanner(
                         metadataReader,
                         _factory,
-                        _db,
                         _logger);
 
                     var assembly = metadataReader.GetAssemblyDefinition();

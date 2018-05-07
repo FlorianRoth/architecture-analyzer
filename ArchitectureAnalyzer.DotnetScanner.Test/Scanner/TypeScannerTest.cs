@@ -2,8 +2,6 @@
 {
     using ArchitectureAnalyzer.DotnetScanner.Scanner;
 
-    using FakeItEasy;
-
     using NUnit.Framework;
 
     using TestLibrary;
@@ -16,49 +14,39 @@
         [SetUp]
         public void SetupScanner()
         {
-            _scanner = new TypeScanner(MetadataReader, ModelFactory, Database, Logger);
+            _scanner = new TypeScanner(MetadataReader, ModelFactory, Logger);
         }
 
         [Test]
-        public void PublicClassIsAddedToDatabase()
+        public void IdIsCorrect()
         {
-            var type = GetTypeDefintion<EmptyClass>();
+            var type = GetTypeDefintion(typeof(EmptyClass));
 
-            _scanner.ScanType(type);
+            var model = _scanner.ScanType(type);
 
-            AssertCreateTypeNode<EmptyClass>();
+            Assert.That(model.Id, Is.EqualTo(typeof(EmptyClass).FullName));
         }
 
         [Test]
-        public void InternalClassIsNotAddedToDatabase()
+        public void NameIsCorrect()
         {
-            var type = GetTypeDefintion<InternalClass>();
+            var type = GetTypeDefintion(typeof(EmptyClass));
 
-            _scanner.ScanType(type);
+            var model = _scanner.ScanType(type);
 
-            AssertNoTypeNode<InternalClass>();
+            Assert.That(model.Name, Is.EqualTo(nameof(EmptyClass)));
         }
 
         [Test]
-        public void MethodIsLinkedToDeclaringClass()
+        public void NamespaceIsCorrect()
         {
-            var type = GetTypeDefintion<ClassWithMembers>();
+            var type = GetTypeDefintion(typeof(EmptyClass));
 
-            _scanner.ScanType(type);
-            
-            A.CallTo(() => Database.CreateRelationship(NetType<ClassWithMembers>(), NetMethod<ClassWithMembers>(nameof(ClassWithMembers.SomeMethod)), Relationship.DEFINES_METHOD)).MustHaveHappened(Repeated.Exactly.Once);
+            var model = _scanner.ScanType(type);
+
+            Assert.That(model.Namespace, Is.EqualTo(typeof(EmptyClass).Namespace));
         }
 
-        [Test]
-        public void OnlyDeclaredMethodsAreProcessed()
-        {
-            var type = GetTypeDefintion<InheritedFromClassWithMembers>();
-
-            _scanner.ScanType(type);
-
-            A.CallTo(() => Database.CreateRelationship(NetType<InheritedFromClassWithMembers>(), NetMethod<ClassWithMembers>(nameof(ClassWithMembers.SomeMethod)), Relationship.DEFINES_METHOD)).MustNotHaveHappened();
-        }
-        
         [Test]
         public void NoFlagIsSetForNormalClass()
         {
