@@ -151,15 +151,32 @@
                 case HandleKind.CustomAttribute:
                     return GetTypeFromCustomAttributeHandle((CustomAttributeHandle)handle);
 
+                case HandleKind.MethodDefinition:
+                    return GetTypeFromMethodDefinitionHandle((MethodDefinitionHandle)handle);
+
+                case HandleKind.MemberReference:
+                    return GetTypeFromMemberReferenceHandle((MemberReferenceHandle)handle);
                 default:
                     return null;
             }
         }
 
+        private NetType GetTypeFromMethodDefinitionHandle(MethodDefinitionHandle handle)
+        {
+                var methodDefinition = Reader.GetMethodDefinition(handle);
+                return GetTypeFromEntityHandle((TypeDefinitionHandle)methodDefinition.GetDeclaringType());
+        }
+
+        private NetType GetTypeFromMemberReferenceHandle(MemberReferenceHandle handle)
+        {
+            var memberReference = Reader.GetMemberReference(handle);
+            return GetTypeFromEntityHandle((TypeReferenceHandle)memberReference.Parent);
+        }
+
         private NetType GetTypeFromCustomAttributeHandle(CustomAttributeHandle handle)
         {
-            var id = GetTypeId(Reader.GetCustomAttribute(handle));
-            return Factory.CreateTypeModel(id);
+            var attribute = Reader.GetCustomAttribute(handle);
+            return GetTypeFromEntityHandle(attribute.Constructor);
         }
 
         private NetType GetTypeFromTypeReferenceHandle(TypeReferenceHandle handle)

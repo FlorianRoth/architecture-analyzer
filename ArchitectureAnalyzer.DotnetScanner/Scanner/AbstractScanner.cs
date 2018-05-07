@@ -36,28 +36,6 @@
             return CreateId(typeRef.Namespace, typeRef.Name);
         }
 
-        protected string GetTypeId(CustomAttribute attribute)
-        {
-            switch (attribute.Constructor.Kind)
-            {
-                case HandleKind.MethodDefinition:
-                    {
-                        var ctor = Reader.GetMethodDefinition((MethodDefinitionHandle)attribute.Constructor);
-                        var typeDef = Reader.GetTypeDefinition((TypeDefinitionHandle)ctor.GetDeclaringType());
-
-                        return GetTypeId(typeDef);
-                    }
-                case HandleKind.MemberReference:
-                    {
-                        var ctor = Reader.GetMemberReference((MemberReferenceHandle)attribute.Constructor);
-                        var typeRef = Reader.GetTypeReference((TypeReferenceHandle)ctor.Parent);
-                        return GetTypeId(typeRef);
-                    }
-                default:
-                    return string.Empty;
-            }
-        }
-
         protected string CreateId(params StringHandle[] parts)
         {
             return string.Join(".", parts.Select(GetString).Where(s => !string.IsNullOrEmpty(s)));
