@@ -47,7 +47,10 @@
                                         nameof(InheritsInterfaceFromBaseClass),
                                         nameof(SealedClass),
                                         nameof(SomeEnum),
-                                        nameof(StaticClass)
+                                        nameof(StaticClass),
+                                        nameof(TestFixtureAttributedClass),
+                                        nameof(UserDefinedAttribute),
+                                        nameof(UserTypeAttributedClass)
                                     };
 
             Assert.That(assemblyModel.DefinedTypes.Select(t => t.Name), Is.EquivalentTo(expectedTypes));
