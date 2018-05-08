@@ -4,4 +4,4 @@ dotnet: 2.0.0
 script:
   - dotnet restore
   - dotnet build
-  - dotnet test ./ArchitectureAnalyzer.DotnetScanner.Test/
+  - dotnet test ./ArchitectureAnalyzer.Net.Scanner.Test/
