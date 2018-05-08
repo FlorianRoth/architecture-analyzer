@@ -39,6 +39,22 @@
         }
 
         [Test]
+        public void UserDefinedAttributeIsLinkedToClass()
+        {
+            _scanner.Scan();
+
+            AssertTypeRelationShip<UserTypeAttributedClass, UserDefinedAttribute>(Relationship.HAS_ATTRIBUTE);
+        }
+
+        [Test]
+        public void TestFixtureAttributeIsLinkedToClass()
+        {
+            _scanner.Scan();
+
+            AssertTypeRelationShip<TestFixtureAttributedClass, TestFixtureAttribute>(Relationship.HAS_ATTRIBUTE);
+        }
+
+        [Test]
         public void InterfaceInheritedFromBaseClassIsNotLinked()
         {
             _scanner.Scan();

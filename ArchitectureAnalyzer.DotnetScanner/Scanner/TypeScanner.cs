@@ -33,16 +33,18 @@
             model.IsStatic = IsStatic(type);
             model.IsAbstract = IsAbstract(type);
             model.IsSealed = IsSealed(type);
+            model.HasAttribute = HasAttribute(type);
 
             Database.CreateNode(model);
 
             SetBaseType(type, model);
             SetImplementedInterfaces(type, model);
+            SetAttributes(type, model);
 
             var methodScanner = new MethodScanner(Reader, Factory, Database, Logger);
-            foreach(var method in type.GetMethods().Select(Reader.GetMethodDefinition))
+            foreach (var method in type.GetMethods().Select(Reader.GetMethodDefinition))
             {
-               var methodModel =  methodScanner.ScanMethod(method, model);
+                var methodModel = methodScanner.ScanMethod(method, model);
 
                 if (methodModel == null)
                 {
@@ -79,6 +81,12 @@
             return atts.HasFlag(TypeAttributes.Sealed) && !atts.HasFlag(TypeAttributes.Abstract);
         }
 
+        private bool HasAttribute(TypeDefinition type)
+        {
+            var atts = type.GetCustomAttributes();
+            return atts.Any();
+        }
+
         private static bool IsStatic(TypeDefinition type)
         {
             var atts = type.Attributes;
@@ -110,6 +118,21 @@
             }
         }
 
+        private void SetAttributes(TypeDefinition type, NetType model)
+        {
+            foreach (var attributeHandle in type.GetCustomAttributes())
+            {
+                var attributeType = GetTypeFromEntityHandle(attributeHandle);
+
+                if (attributeType == null)
+                {
+                    return;
+                }
+
+                model.Attributes.Add(attributeType);
+            }
+        }
+
         private NetType GetTypeFromEntityHandle(EntityHandle handle)
         {
             if (handle.IsNil)
@@ -125,9 +148,35 @@
                 case HandleKind.TypeReference:
                     return GetTypeFromTypeReferenceHandle((TypeReferenceHandle)handle);
 
+                case HandleKind.CustomAttribute:
+                    return GetTypeFromCustomAttributeHandle((CustomAttributeHandle)handle);
+
+                case HandleKind.MethodDefinition:
+                    return GetTypeFromMethodDefinitionHandle((MethodDefinitionHandle)handle);
+
+                case HandleKind.MemberReference:
+                    return GetTypeFromMemberReferenceHandle((MemberReferenceHandle)handle);
                 default:
                     return null;
             }
+        }
+
+        private NetType GetTypeFromMethodDefinitionHandle(MethodDefinitionHandle handle)
+        {
+                var methodDefinition = Reader.GetMethodDefinition(handle);
+                return GetTypeFromEntityHandle((TypeDefinitionHandle)methodDefinition.GetDeclaringType());
+        }
+
+        private NetType GetTypeFromMemberReferenceHandle(MemberReferenceHandle handle)
+        {
+            var memberReference = Reader.GetMemberReference(handle);
+            return GetTypeFromEntityHandle((TypeReferenceHandle)memberReference.Parent);
+        }
+
+        private NetType GetTypeFromCustomAttributeHandle(CustomAttributeHandle handle)
+        {
+            var attribute = Reader.GetCustomAttribute(handle);
+            return GetTypeFromEntityHandle(attribute.Constructor);
         }
 
         private NetType GetTypeFromTypeReferenceHandle(TypeReferenceHandle handle)
@@ -149,7 +198,6 @@
                 return false;
             }
 
-            
             if (type.Attributes.HasFlag(TypeAttributes.SpecialName))
             {
                 return false;

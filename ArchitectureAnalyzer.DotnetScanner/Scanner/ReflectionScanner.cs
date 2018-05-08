@@ -68,9 +68,10 @@
             {
                 ConnectBaseType(type);
                 ConnectInterfaceImplementations(type);
+                ConnectAttributes(type);
             }
         }
-        
+
         private void ConnectBaseType(NetType type)
         {
             if (type.BaseType != null)
@@ -87,6 +88,14 @@
             foreach (var interfaceType in type.Implements.Except(interfacesFromBaseInterfaces))
             {
                 _db.CreateRelationship(type, interfaceType, Relationship.IMPLEMENTS);
+            }
+        }
+
+        private void ConnectAttributes(NetType type)
+        {
+            foreach (var attributeType in type.Attributes)
+            {
+                _db.CreateRelationship(type, attributeType, Relationship.HAS_ATTRIBUTE);
             }
         }
 
