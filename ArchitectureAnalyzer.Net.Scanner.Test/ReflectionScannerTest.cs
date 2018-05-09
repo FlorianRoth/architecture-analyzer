@@ -31,7 +31,8 @@
         {
             _scanner.Scan();
 
-            A.CallTo(() => _database.CreateNode(NetAssembly("TestLibrary"))).MustHaveHappened(Repeated.Exactly.Once);
+            AssertNodeInDatabase(
+                NetAssembly("TestLibrary"));
         }
 
         [Test]
@@ -39,15 +40,21 @@
         {
             _scanner.Scan();
             
-            AssertTypeRelationShip<InheritedClass, EmptyClass>(Relationship.EXTENDS);
+            AssertRelationshipInDatabase(
+                NetType<InheritedClass>(),
+                NetType<EmptyClass>(),
+                Relationship.EXTENDS);
         }
 
         [Test]
         public void ImplementedInterfaceIsLinkedToClass()
         {
             _scanner.Scan();
-            
-            AssertTypeRelationShip<ImplementsInterface, IInterface>(Relationship.IMPLEMENTS);
+
+            AssertRelationshipInDatabase(
+                NetType<ImplementsInterface>(),
+                NetType<IInterface>(),
+                Relationship.IMPLEMENTS);
         }
 
         [Test]
@@ -55,7 +62,10 @@
         {
             _scanner.Scan();
 
-            AssertTypeRelationShip<UserTypeAttributedClass, UserDefinedAttribute>(Relationship.HAS_ATTRIBUTE);
+            AssertRelationshipInDatabase(
+                NetType<UserTypeAttributedClass>(),
+                NetType<UserDefinedAttribute>(),
+                Relationship.HAS_ATTRIBUTE);
         }
 
         [Test]
@@ -63,25 +73,42 @@
         {
             _scanner.Scan();
 
-            AssertTypeRelationShip<TestFixtureAttributedClass, TestFixtureAttribute>(Relationship.HAS_ATTRIBUTE);
+            AssertRelationshipInDatabase(
+                NetType<TestFixtureAttributedClass>(),
+                NetType<TestFixtureAttribute>(),
+                Relationship.HAS_ATTRIBUTE);
         }
 
         [Test]
         public void InterfaceInheritedFromBaseClassIsNotLinked()
         {
             _scanner.Scan();
-            
-            AssertTypeRelationShip<InheritsInterfaceFromBaseClass, ImplementsInterface>(Relationship.EXTENDS);
-            AssertNoTypeRelationShip<InheritsInterfaceFromBaseClass, IInterface>(Relationship.IMPLEMENTS);
+
+            AssertRelationshipInDatabase(
+                NetType<InheritsInterfaceFromBaseClass>(),
+                NetType<ImplementsInterface>(),
+                Relationship.EXTENDS);
+
+            AssertNoRelationshipInDatabase(
+                NetType<InheritsInterfaceFromBaseClass>(),
+                NetType<IInterface>(),
+                Relationship.IMPLEMENTS);
         }
 
         [Test]
         public void InterfaceInheritedFromBaseInterfaceIsNotLinked()
         {
             _scanner.Scan();
-            
-            AssertTypeRelationShip<IAgainExtendedInterface, IExtendedInterface>(Relationship.IMPLEMENTS);
-            AssertNoTypeRelationShip<IAgainExtendedInterface, IInterface>(Relationship.IMPLEMENTS);
+
+            AssertRelationshipInDatabase(
+                NetType<IAgainExtendedInterface>(),
+                NetType<IExtendedInterface>(),
+                Relationship.IMPLEMENTS);
+
+            AssertNoRelationshipInDatabase(
+                NetType<IAgainExtendedInterface>(),
+                NetType<IInterface>(),
+                Relationship.IMPLEMENTS);
         }
 
         [Test]
@@ -89,7 +116,8 @@
         {
             _scanner.Scan();
 
-            AssertCreateTypeNode<EmptyClass>();
+            AssertNodeInDatabase(
+                NetType<EmptyClass>());
         }
 
         [Test]
@@ -97,7 +125,8 @@
         {
             _scanner.Scan();
 
-            AssertNoTypeNode<InternalClass>();
+            AssertNoNodeInDatabase(
+                NetType<InternalClass>());
         }
 
         [Test]
@@ -105,7 +134,10 @@
         {
             _scanner.Scan();
 
-            A.CallTo(() => _database.CreateRelationship(NetType<ClassWithMembers>(), NetMethod<ClassWithMembers>(nameof(ClassWithMembers.SomeMethod)), Relationship.DEFINES_METHOD)).MustHaveHappened(Repeated.Exactly.Once);
+            AssertRelationshipInDatabase(
+                NetType<ClassWithMembers>(),
+                NetMethod<ClassWithMembers>(nameof(ClassWithMembers.SomeMethod)),
+                Relationship.DEFINES_METHOD);
         }
 
         [Test]
@@ -113,7 +145,10 @@
         {
             _scanner.Scan();
 
-            A.CallTo(() => _database.CreateRelationship(NetType<InheritedFromClassWithMembers>(), NetMethod<ClassWithMembers>(nameof(ClassWithMembers.SomeMethod)), Relationship.DEFINES_METHOD)).MustNotHaveHappened();
+            AssertNoRelationshipInDatabase(
+                NetType<InheritedFromClassWithMembers>(),
+                NetMethod<ClassWithMembers>(nameof(ClassWithMembers.SomeMethod)),
+                Relationship.DEFINES_METHOD);
         }
 
         [Test]
@@ -121,7 +156,8 @@
         {
             _scanner.Scan();
 
-            AssertCreateMethodNode<ClassWithMembers>(nameof(ClassWithMembers.SomeMethod));
+            AssertNodeInDatabase(
+                NetMethod<ClassWithMembers>(nameof(ClassWithMembers.SomeMethod)));
         }
 
         [Test]
@@ -129,15 +165,17 @@
         {
             _scanner.Scan();
 
-            AssertNoMethodNode<ClassWithMembers>(nameof(ClassWithMembers.InternalMethod));
+            AssertNoNodeInDatabase(
+                NetMethod<ClassWithMembers>(nameof(ClassWithMembers.InternalMethod)));
         }
 
         [Test]
         public void ConstructorIsAddedToDatabase()
         {
             _scanner.Scan();
-
-            AssertCreateMethodNode<InheritedFromClassWithMembers>(".ctor");
+            
+            AssertNodeInDatabase(
+                NetMethod<InheritedFromClassWithMembers>(".ctor"));
         }
 
         [TestCase("get_")]
@@ -148,7 +186,8 @@
             
             _scanner.Scan();
 
-            AssertNoMethodNode<ClassWithMembers>(methodName);
+            AssertNoNodeInDatabase(
+                NetMethod<ClassWithMembers>(methodName));
         }
 
         [TestCase("add_")]
@@ -159,7 +198,8 @@
 
             _scanner.Scan();
 
-            AssertNoMethodNode<ClassWithMembers>(methodName);
+            AssertNoNodeInDatabase(
+                NetMethod<ClassWithMembers>(methodName));
         }
 
         [TestCase("op_Equality")]
@@ -168,37 +208,29 @@
         {
             _scanner.Scan();
 
-            AssertCreateMethodNode<ClassWithMembers>(methodName);
+            AssertNodeInDatabase(
+                NetMethod<ClassWithMembers>(methodName));
         }
 
-        private void AssertCreateTypeNode<T>()
+
+        private void AssertNodeInDatabase<TNode>(TNode node) where TNode : Node
         {
-            A.CallTo(() => _database.CreateNode(NetType<T>())).MustHaveHappened(Repeated.Exactly.Once);
+            A.CallTo(() => _database.CreateNode(node)).MustHaveHappened(Repeated.Exactly.Once);
         }
 
-        private void AssertNoTypeNode<T>()
+        private void AssertNoNodeInDatabase<TNode>(TNode node) where TNode : Node
         {
-            A.CallTo(() => _database.CreateNode(NetType<T>())).MustNotHaveHappened();
+            A.CallTo(() => _database.CreateNode(node)).MustNotHaveHappened();
+        }
+        
+        private void AssertRelationshipInDatabase<TFrom, TTo>(TFrom from, TTo to, string relationship) where TFrom : Node where TTo : Node
+        {
+            A.CallTo(() => _database.CreateRelationship(from, to, relationship)).MustHaveHappened(Repeated.Exactly.Once);
         }
 
-        private void AssertCreateMethodNode<T>(string methodName)
+        private void AssertNoRelationshipInDatabase<TFrom, TTo>(TFrom from, TTo to, string relationship) where TFrom : Node where TTo : Node
         {
-            A.CallTo(() => _database.CreateNode(NetMethod<T>(methodName))).MustHaveHappened(Repeated.Exactly.Once);
-        }
-
-        private void AssertNoMethodNode<T>(string methodName)
-        {
-            A.CallTo(() => _database.CreateNode(NetMethod<T>(methodName))).MustNotHaveHappened();
-        }
-
-        private void AssertTypeRelationShip<TFrom, TTo>(string relationship)
-        {
-            A.CallTo(() => _database.CreateRelationship(NetType<TFrom>(), NetType<TTo>(), relationship)).MustHaveHappened(Repeated.Exactly.Once);
-        }
-
-        private void AssertNoTypeRelationShip<TFrom, TTo>(string relationship)
-        {
-            A.CallTo(() => _database.CreateRelationship(NetType<TFrom>(), NetType<TTo>(), relationship)).MustNotHaveHappened();
+            A.CallTo(() => _database.CreateRelationship(from, to, relationship)).MustNotHaveHappened();
         }
     }
 }
