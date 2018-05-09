@@ -2,6 +2,7 @@
 namespace ArchitectureAnalyzer.Net.Scanner
 {
     using System;
+    using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Linq;
     using System.Reflection.Metadata;
@@ -15,73 +16,44 @@ namespace ArchitectureAnalyzer.Net.Scanner
     {
         private readonly IModelFactory _factory;
 
+        private readonly IDictionary<PrimitiveTypeCode, NetType> _primitiveTypes;
+
         public SignatureTypeProvider(IModelFactory factory)
         {
             _factory = factory;
+
+            _primitiveTypes = new Dictionary<PrimitiveTypeCode, NetType>
+                                  {
+                                      { PrimitiveTypeCode.Boolean, _factory.CreateTypeModel(TypeKey.FromType<bool>()) },
+                                      { PrimitiveTypeCode.Byte, _factory.CreateTypeModel(TypeKey.FromType<byte>()) },
+                                      { PrimitiveTypeCode.SByte, _factory.CreateTypeModel(TypeKey.FromType<sbyte>()) },
+                                      { PrimitiveTypeCode.Char, _factory.CreateTypeModel(TypeKey.FromType<char>()) },
+                                      { PrimitiveTypeCode.Int16, _factory.CreateTypeModel(TypeKey.FromType<short>()) },
+                                      { PrimitiveTypeCode.UInt16, _factory.CreateTypeModel(TypeKey.FromType<ushort>()) },
+                                      { PrimitiveTypeCode.Int32, _factory.CreateTypeModel(TypeKey.FromType<int>()) },
+                                      { PrimitiveTypeCode.UInt32, _factory.CreateTypeModel(TypeKey.FromType<uint>()) },
+                                      { PrimitiveTypeCode.Int64, _factory.CreateTypeModel(TypeKey.FromType<long>()) },
+                                      { PrimitiveTypeCode.UInt64, _factory.CreateTypeModel(TypeKey.FromType<ulong>()) },
+                                      { PrimitiveTypeCode.Single, _factory.CreateTypeModel(TypeKey.FromType<float>()) },
+                                      { PrimitiveTypeCode.Double, _factory.CreateTypeModel(TypeKey.FromType<double>()) },
+                                      { PrimitiveTypeCode.IntPtr, _factory.CreateTypeModel(TypeKey.FromType<IntPtr>()) },
+                                      { PrimitiveTypeCode.UIntPtr, _factory.CreateTypeModel(TypeKey.FromType<UIntPtr>()) },
+                                      { PrimitiveTypeCode.Object, _factory.CreateTypeModel(TypeKey.FromType<object>()) },
+                                      { PrimitiveTypeCode.String, _factory.CreateTypeModel(TypeKey.FromType<string>()) },
+                                      { PrimitiveTypeCode.Void, _factory.CreateTypeModel(TypeKey.FromType(typeof(void))) },
+                                      // Not sure about this one
+                                      { PrimitiveTypeCode.TypedReference, _factory.CreateTypeModel(TypeKey.FromType<TypeReference>()) }
+                                  };
         }
 
         public NetType GetPrimitiveType(PrimitiveTypeCode typeCode)
         {
-            switch (typeCode)
+            if (_primitiveTypes.TryGetValue(typeCode, out var type))
             {
-                case PrimitiveTypeCode.Boolean:
-                    return _factory.CreateTypeModel(TypeKey.FromType<bool>());
-
-                case PrimitiveTypeCode.Byte:
-                    return _factory.CreateTypeModel(TypeKey.FromType<byte>());
-
-                case PrimitiveTypeCode.SByte:
-                    return _factory.CreateTypeModel(TypeKey.FromType<sbyte>());
-
-                case PrimitiveTypeCode.Char:
-                    return _factory.CreateTypeModel(TypeKey.FromType<char>());
-
-                case PrimitiveTypeCode.Int16:
-                    return _factory.CreateTypeModel(TypeKey.FromType<short>());
-
-                case PrimitiveTypeCode.UInt16:
-                    return _factory.CreateTypeModel(TypeKey.FromType<ushort>());
-
-                case PrimitiveTypeCode.Int32:
-                    return _factory.CreateTypeModel(TypeKey.FromType<int>());
-
-                case PrimitiveTypeCode.UInt32:
-                    return _factory.CreateTypeModel(TypeKey.FromType<uint>());
-
-                case PrimitiveTypeCode.Int64:
-                    return _factory.CreateTypeModel(TypeKey.FromType<long>());
-
-                case PrimitiveTypeCode.UInt64:
-                    return _factory.CreateTypeModel(TypeKey.FromType<ulong>());
-
-                case PrimitiveTypeCode.Single:
-                    return _factory.CreateTypeModel(TypeKey.FromType<float>());
-
-                case PrimitiveTypeCode.Double:
-                    return _factory.CreateTypeModel(TypeKey.FromType<double>());
-
-                case PrimitiveTypeCode.IntPtr:
-                    return _factory.CreateTypeModel(TypeKey.FromType<IntPtr>());
-
-                case PrimitiveTypeCode.UIntPtr:
-                    return _factory.CreateTypeModel(TypeKey.FromType<UIntPtr>());
-
-                case PrimitiveTypeCode.Object:
-                    return _factory.CreateTypeModel(TypeKey.FromType<object>());
-
-                case PrimitiveTypeCode.String:
-                    return _factory.CreateTypeModel(TypeKey.FromType<string>());
-
-                case PrimitiveTypeCode.TypedReference:
-                    // todo: not sure
-                    return _factory.CreateTypeModel(TypeKey.FromType<TypeReference>());
-
-                case PrimitiveTypeCode.Void:
-                    return _factory.CreateTypeModel(TypeKey.FromType(typeof(void)));
-
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(typeCode), typeCode, null);
+                return type;
             }
+
+            throw new ArgumentOutOfRangeException(nameof(typeCode), typeCode, null);
         }
 
         public NetType GetTypeFromDefinition(
