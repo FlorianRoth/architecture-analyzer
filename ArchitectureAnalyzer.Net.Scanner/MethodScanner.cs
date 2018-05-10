@@ -73,22 +73,36 @@
 
             var name = method.Name.GetString(Reader);
             var signatureTypeProvider = new SignatureTypeProvider(Factory);
-            var signature = method.DecodeSignature(signatureTypeProvider, null);
-            
-            var methodModel = Factory.CreateMethodModel(new MethodKey(name));
+            var signature = method.DecodeSignature(signatureTypeProvider, typeModel);
+
+            var key = new MethodKey(typeModel.GetKey(), name);
+
+            var methodModel = Factory.CreateMethodModel(key);
             methodModel.Name = name;
             methodModel.IsAbstract = IsAbstract(method);
             methodModel.IsStatic = IsStatic(method);
             methodModel.IsSealed = IsSealed(method);
+            methodModel.IsGeneric = IsGeneric(method);
+            methodModel.GenericParameters = CreateGenericParameters(method, key);
             methodModel.ReturnType = signature.ReturnType;
             methodModel.ParameterTypes = signature.ParameterTypes;
-
+            
             return methodModel;
         }
 
-        private string CreateSignatureString(NetType typeModel, string name, MethodSignature<NetType> signature)
+        private IReadOnlyList<NetType> CreateGenericParameters(MethodDefinition method, MethodKey methodKey)
         {
-            return $"{typeModel.Namespace}.{typeModel.Name}.{name}({string.Join(",", signature.ParameterTypes.Select(t => t.Id))}):{signature.ReturnType.Id}";
+            return method.GetGenericParameters()
+                .Select(Reader.GetGenericParameter)
+                .Select(arg => CreateGenericParameter(arg, methodKey))
+                .ToList();
+        }
+
+        private NetType CreateGenericParameter(GenericParameter arg, MethodKey methodKey)
+        {
+            var name = arg.Name.GetString(Reader);
+
+            return Factory.CreateGenericParameter(methodKey, name);
         }
 
         private static bool IsAbstract(MethodDefinition method)
@@ -104,6 +118,11 @@
         private static bool IsSealed(MethodDefinition method)
         {
             return method.Attributes.HasFlag(MethodAttributes.Final);
+        }
+
+        private bool IsGeneric(MethodDefinition method)
+        {
+            return method.GetGenericParameters().Any();
         }
 
         private bool IncludeMethod(MethodDefinition method)

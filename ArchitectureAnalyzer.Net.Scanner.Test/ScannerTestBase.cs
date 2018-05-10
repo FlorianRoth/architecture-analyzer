@@ -52,6 +52,16 @@
             return ModelFactory.GetTypeModels().FirstOrDefault(t => Equals(t.GetKey(), key));
         }
 
+        protected NetType NetType<T>(string methodName, string typeArgName)
+        {
+            var typeKey = TypeKey.FromType<T>();
+            var methodKey = new MethodKey(typeKey, methodName);
+
+            var key = TypeKey.FromMethodParameter(methodKey, typeArgName);
+            
+            return ModelFactory.GetTypeModels().FirstOrDefault(t => Equals(t.GetKey(), key));
+        }
+
         protected NetMethod NetMethod<T>(string methodName)
         {
             return ModelFactory.GetMethodModels().FirstOrDefault(m => m.Name == methodName);

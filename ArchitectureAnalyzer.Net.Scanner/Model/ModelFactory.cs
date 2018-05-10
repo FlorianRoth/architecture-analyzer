@@ -56,6 +56,17 @@
             return model;
         }
 
+        public NetType CreateGenericParameter(MethodKey key, string typeArgName)
+        {
+            var argKey = TypeKey.FromMethodParameter(key, typeArgName);
+
+            var model = _typeMap[argKey];
+            model.Name = argKey.Name;
+            model.Namespace = argKey.Namespace;
+
+            return model;
+        }
+
         public IEnumerable<NetAssembly> GetAssemblyModels()
         {
             return _assemblyMap.Models;

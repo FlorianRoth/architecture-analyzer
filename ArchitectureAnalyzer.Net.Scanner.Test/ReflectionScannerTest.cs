@@ -1,6 +1,7 @@
 ﻿namespace ArchitectureAnalyzer.Net.Scanner.Test
 {
     using ArchitectureAnalyzer.Core.Graph;
+    using ArchitectureAnalyzer.Net.Model;
 
     using FakeItEasy;
 
@@ -141,6 +142,35 @@
         }
 
         [Test]
+        public void ParametersAreLinkedToMethod()
+        {
+            _scanner.Scan();
+
+            AssertRelationshipInDatabase(
+                NetMethod<ClassWithMembers>(nameof(ClassWithMembers.MethodWithParams)),
+                NetType<int>(),
+                Relationship.HAS_PARAMETER,
+                new HasParameterRelationship(0));
+
+            AssertRelationshipInDatabase(
+                NetMethod<ClassWithMembers>(nameof(ClassWithMembers.MethodWithParams)),
+                NetType<string>(),
+                Relationship.HAS_PARAMETER,
+                new HasParameterRelationship(1));
+        }
+
+        [Test]
+        public void GenericParametersAreLinkedToMethod()
+        {
+            _scanner.Scan();
+
+            AssertRelationshipInDatabase(
+                NetMethod<ClassWithMembers>(nameof(ClassWithMembers.GenericMethod)),
+                NetType<ClassWithMembers>(nameof(ClassWithMembers.GenericMethod), "TMethodArg"),
+                Relationship.DEFINES_GENERIC_METHOD_ARG);
+        }
+
+        [Test]
         public void OnlyDeclaredMethodsAreProcessed()
         {
             _scanner.Scan();
@@ -222,7 +252,7 @@
             AssertRelationshipInDatabase(
                 NetType(typeof(GenericClass<>)),
                 NetType(typeof(GenericClass<>), "TTypeArg"),
-                Relationship.DEFINES_TYPE_ARG);
+                Relationship.DEFINES_GENERIC_TYPE_ARG);
         }
 
         private void AssertNodeInDatabase<TNode>(TNode node) where TNode : Node
@@ -238,6 +268,11 @@
         private void AssertRelationshipInDatabase<TFrom, TTo>(TFrom from, TTo to, string relationship) where TFrom : Node where TTo : Node
         {
             A.CallTo(() => _database.CreateRelationship(from, to, relationship)).MustHaveHappened(Repeated.Exactly.Once);
+        }
+
+        private void AssertRelationshipInDatabase<TFrom, TTo, TRel>(TFrom from, TTo to, string relationship, TRel relationshipProperties) where TFrom : Node where TTo : Node
+        {
+            A.CallTo(() => _database.CreateRelationship(from, to, relationship, relationshipProperties)).MustHaveHappened(Repeated.Exactly.Once);
         }
 
         private void AssertNoRelationshipInDatabase<TFrom, TTo>(TFrom from, TTo to, string relationship) where TFrom : Node where TTo : Node

@@ -16,11 +16,21 @@
 
         public bool IsSealed { get; set; }
 
+        public bool IsGeneric { get; set; }
+
         [JsonIgnore]
         public NetType ReturnType { get; set; }
 
         [JsonIgnore]
         public IReadOnlyList<NetType> ParameterTypes { get; set; }
+
+        [JsonIgnore]
+        public IReadOnlyList<NetType> GenericParameters { get; set; }
+
+        public NetMethod()
+        {
+            GenericParameters = new List<NetType>();
+        }
 
         public override string ToString()
         {

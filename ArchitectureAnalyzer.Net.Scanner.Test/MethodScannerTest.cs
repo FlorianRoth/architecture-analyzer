@@ -10,11 +10,15 @@
     public class MethodScannerTest : MetadataScannerTestBase
     {
         private MethodScanner _scanner;
-
+        
         [SetUp]
         public void SetupScanner()
         {
             _scanner = new MethodScanner(MetadataReader, ModelFactory, Logger);
+
+            var typeScanner = new TypeScanner(MetadataReader, ModelFactory, Logger);
+            typeScanner.ScanType(GetTypeDefintion<ClassWithMembers>());
+            typeScanner.ScanType(GetTypeDefintion<InheritedFromClassWithMembers>());
         }
         
         [Test]
@@ -51,6 +55,18 @@
         }
 
         [Test]
+        public void GenericParamtersAreCorrect()
+        {
+            var method = GetMethodDefinition<ClassWithMembers>(nameof(ClassWithMembers.GenericMethod));
+
+            var model = _scanner.ScanMethod(method, NetType<ClassWithMembers>());
+
+            Assert.That(model.GenericParameters.Count, Is.EqualTo(1));
+            
+            Assert.That(model.GenericParameters[0].Name, Is.EqualTo(nameof(ClassWithMembers) + "/GenericMethod<TMethodArg>"));
+        }
+
+        [Test]
         public void IsStaticFlagIsSetForStaticMethod()
         {
             var method = GetMethodDefinition<ClassWithMembers>(nameof(ClassWithMembers.StaticMethod));
@@ -60,6 +76,7 @@
             Assert.That(model.IsStatic, Is.True);
             Assert.That(model.IsAbstract, Is.False);
             Assert.That(model.IsSealed, Is.False);
+            Assert.That(model.IsGeneric, Is.False);
         }
 
         [Test]
@@ -72,6 +89,7 @@
             Assert.That(model.IsStatic, Is.False);
             Assert.That(model.IsAbstract, Is.True);
             Assert.That(model.IsSealed, Is.False);
+            Assert.That(model.IsGeneric, Is.False);
         }
         
         [Test]
@@ -84,6 +102,20 @@
             Assert.That(model.IsStatic, Is.False);
             Assert.That(model.IsAbstract, Is.False);
             Assert.That(model.IsSealed, Is.True);
+            Assert.That(model.IsGeneric, Is.False);
+        }
+
+        [Test]
+        public void IsGenericFlagIsSetForGenericMethod()
+        {
+            var method = GetMethodDefinition<ClassWithMembers>(nameof(ClassWithMembers.GenericMethod));
+
+            var model = _scanner.ScanMethod(method, NetType<ClassWithMembers>());
+
+            Assert.That(model.IsStatic, Is.False);
+            Assert.That(model.IsAbstract, Is.False);
+            Assert.That(model.IsSealed, Is.False);
+            Assert.That(model.IsGeneric, Is.True);
         }
     }
 }

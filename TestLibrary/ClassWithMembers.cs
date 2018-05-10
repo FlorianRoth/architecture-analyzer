@@ -43,6 +43,10 @@
 
         public abstract void AbstractMethod();
 
+        public void GenericMethod<TMethodArg>()
+        {
+        }
+
         public static bool operator==(ClassWithMembers a, ClassWithMembers b)
         {
             return false;

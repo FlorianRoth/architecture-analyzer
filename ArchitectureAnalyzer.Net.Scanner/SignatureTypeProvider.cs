@@ -12,7 +12,7 @@ namespace ArchitectureAnalyzer.Net.Scanner
     using ArchitectureAnalyzer.Net.Scanner.Model;
     using ArchitectureAnalyzer.Net.Scanner.Utils;
 
-    internal class SignatureTypeProvider : ISignatureTypeProvider<NetType, object>
+    internal class SignatureTypeProvider : ISignatureTypeProvider<NetType, NetType>
     {
         private readonly IModelFactory _factory;
 
@@ -74,7 +74,7 @@ namespace ArchitectureAnalyzer.Net.Scanner
 
         public NetType GetTypeFromSpecification(
             MetadataReader reader,
-            object genericContext,
+            NetType genericContext,
             TypeSpecificationHandle handle,
             byte rawTypeKind)
         {
@@ -145,14 +145,14 @@ namespace ArchitectureAnalyzer.Net.Scanner
             throw new NotImplementedException();
         }
 
-        public NetType GetGenericMethodParameter(object genericContext, int index)
+        public NetType GetGenericMethodParameter(NetType genericContext, int index)
         {
-            return _factory.CreateTypeModel(new TypeKey(string.Empty, "!!" + index));
+            throw new NotImplementedException();
         }
 
-        public NetType GetGenericTypeParameter(object genericContext, int index)
+        public NetType GetGenericTypeParameter(NetType genericContext, int index)
         {
-            return _factory.CreateTypeModel(new TypeKey(string.Empty, "!" + index));
+            return genericContext.GenericTypeArgs[index];
         }
 
         public NetType GetModifiedType(NetType modifier, NetType unmodifiedType, bool isRequired)

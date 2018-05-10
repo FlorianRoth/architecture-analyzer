@@ -36,5 +36,12 @@
         {
             return new TypeKey(type.Namespace, type.Name + "<" + typeArg + ">");
         }
+
+        public static TypeKey FromMethodParameter(MethodKey key, string typeArg)
+        {
+            return new TypeKey(
+                key.DeclaringType.Namespace,
+                key.DeclaringType.Name + "/" + key.Name + "<" + typeArg + ">");
+        }
     }
 }

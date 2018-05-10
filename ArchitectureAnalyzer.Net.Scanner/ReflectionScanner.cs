@@ -184,11 +184,28 @@
             _db.CreateRelationship(type, method, Relationship.DEFINES_METHOD);
             _db.CreateRelationship(method, method.ReturnType, Relationship.RETURNS);
 
+            ConnectMethodParameters(method);
+            ConnectGenericMethodParameters(method);
+        }
+        
+        private void ConnectMethodParameters(NetMethod method)
+        {
             var order = 0;
             foreach (var param in method.ParameterTypes)
             {
-                var rel = new HasParameterRelationship { Order = order++ };
-                _db.CreateRelationship(method, param, Relationship.HAS_PARAMETER, rel);
+                _db.CreateRelationship(
+                    method,
+                    param,
+                    Relationship.HAS_PARAMETER,
+                    new HasParameterRelationship(order++));
+            }
+        }
+
+        private void ConnectGenericMethodParameters(NetMethod method)
+        {
+            foreach (var param in method.GenericParameters)
+            {
+                _db.CreateRelationship(method, param, Relationship.DEFINES_GENERIC_METHOD_ARG);
             }
         }
 
@@ -196,7 +213,7 @@
         {
             foreach (var arg in type.GenericTypeArgs)
             {
-                _db.CreateRelationship(type, arg, Relationship.DEFINES_TYPE_ARG);
+                _db.CreateRelationship(type, arg, Relationship.DEFINES_GENERIC_TYPE_ARG);
             }
         }
     }
