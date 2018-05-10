@@ -12,6 +12,8 @@
 
         NetMethod CreateMethodModel(MethodKey key);
 
+        NetType CreateGenericTypeArg(TypeKey key, string typeArgName);
+
         IEnumerable<NetAssembly> GetAssemblyModels();
         
         IEnumerable<NetType> GetTypeModels();

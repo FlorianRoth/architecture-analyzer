@@ -212,6 +212,18 @@
                 NetMethod<ClassWithMembers>(methodName));
         }
 
+        [Test]
+        public void GenericTypeArgumentIsLinked()
+        {
+            _scanner.Scan();
+
+            var from = NetType(typeof(GenericClass<>));
+
+            AssertRelationshipInDatabase(
+                NetType(typeof(GenericClass<>)),
+                NetType(typeof(GenericClass<>), "TTypeArg"),
+                Relationship.DEFINES_TYPE_ARG);
+        }
 
         private void AssertNodeInDatabase<TNode>(TNode node) where TNode : Node
         {

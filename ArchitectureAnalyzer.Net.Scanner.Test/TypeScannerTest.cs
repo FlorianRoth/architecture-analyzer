@@ -26,6 +26,16 @@
         }
 
         [Test]
+        public void NameIsCorrectForGenericType()
+        {
+            var type = GetTypeDefintion(typeof(GenericClass<>));
+
+            var model = _scanner.ScanType(type);
+
+            Assert.That(model.Name, Is.EqualTo(typeof(GenericClass<>).Name));
+        }
+
+        [Test]
         public void NamespaceIsCorrect()
         {
             var type = GetTypeDefintion(typeof(EmptyClass));
@@ -46,6 +56,7 @@
             Assert.That(model.IsAbstract, Is.False);
             Assert.That(model.IsSealed, Is.False);
             Assert.That(model.HasAttribute, Is.False);
+            Assert.That(model.IsGeneric, Is.False);
         }
 
         [Test]
@@ -59,6 +70,7 @@
             Assert.That(model.IsAbstract, Is.False);
             Assert.That(model.IsSealed, Is.False);
             Assert.That(model.HasAttribute, Is.False);
+            Assert.That(model.IsGeneric, Is.False);
         }
 
         [Test]
@@ -72,6 +84,7 @@
             Assert.That(model.IsAbstract, Is.True);
             Assert.That(model.IsSealed, Is.False);
             Assert.That(model.HasAttribute, Is.False);
+            Assert.That(model.IsGeneric, Is.False);
         }
 
         [Test]
@@ -85,6 +98,7 @@
             Assert.That(model.IsAbstract, Is.False);
             Assert.That(model.IsSealed, Is.True);
             Assert.That(model.HasAttribute, Is.False);
+            Assert.That(model.IsGeneric, Is.False);
         }
 
         [Test]
@@ -98,6 +112,7 @@
             Assert.That(model.IsAbstract, Is.False);
             Assert.That(model.IsSealed, Is.False);
             Assert.That(model.HasAttribute, Is.True);
+            Assert.That(model.IsGeneric, Is.False);
         }
 
         [Test]
@@ -110,7 +125,22 @@
             Assert.That(model.IsStatic, Is.False);
             Assert.That(model.IsAbstract, Is.False);
             Assert.That(model.IsSealed, Is.False);
+            Assert.That(model.IsGeneric, Is.False);
             Assert.That(model.HasAttribute, Is.True);
+        }
+
+        [Test]
+        public void IsGenericFlagIsSetForGenericClass()
+        {
+            var type = GetTypeDefintion(typeof(GenericClass<>));
+
+            var model = _scanner.ScanType(type);
+
+            Assert.That(model.IsStatic, Is.False);
+            Assert.That(model.IsAbstract, Is.False);
+            Assert.That(model.IsSealed, Is.False);
+            Assert.That(model.IsGeneric, Is.True);
+            Assert.That(model.HasAttribute, Is.False);
         }
 
         [Test]
@@ -141,6 +171,18 @@
             var model = _scanner.ScanType(type);
 
             Assert.That(model.Type, Is.EqualTo(Net.Model.NetType.TypeClass.Enum));
+        }
+
+        [Test]
+        public void GenericTypeArgsAreSetForGenericClass()
+        {
+            var type = GetTypeDefintion(typeof(GenericClass<>));
+
+            var model = _scanner.ScanType(type);
+
+            Assert.That(model.GenericTypeArgs.Count, Is.EqualTo(1));
+
+            Assert.That(model.GenericTypeArgs[0].Name, Is.EqualTo(typeof(GenericClass<>).Name + "<TTypeArg>"));
         }
     }
 }

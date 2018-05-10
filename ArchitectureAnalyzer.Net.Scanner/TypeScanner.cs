@@ -1,6 +1,7 @@
 ﻿namespace ArchitectureAnalyzer.Net.Scanner
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
     using System.Reflection.Metadata;
@@ -29,33 +30,30 @@
                 return null;
             }
 
-            var typeModel = Factory.CreateTypeModel(type.GetTypeKey(Reader));
+            var typeKey = type.GetTypeKey(Reader);
+
+            var typeModel = Factory.CreateTypeModel(typeKey);
             typeModel.Type = GetTypeClass(type);
-            typeModel.Name = type.Name.GetString(Reader);
+            typeModel.Name = GetTypeName(type);
             typeModel.Namespace = type.Namespace.GetString(Reader);
             typeModel.IsStatic = IsStatic(type);
             typeModel.IsAbstract = IsAbstract(type);
             typeModel.IsSealed = IsSealed(type);
             typeModel.HasAttribute = HasAttribute(type);
-
+            typeModel.IsGeneric = IsGeneric(type);
+            typeModel.GenericTypeArgs = CreateGenericTypeArgs(type, typeKey);
+            typeModel.Methods = CreateMethods(type, typeModel).ToList();
+            
             SetBaseType(type, typeModel);
             SetImplementedInterfaces(type, typeModel);
             SetAttributes(type, typeModel);
-
-            var methodScanner = new MethodScanner(Reader, Factory, Logger);
-            foreach (var method in type.GetMethods().Select(Reader.GetMethodDefinition))
-            {
-               var methodModel =  methodScanner.ScanMethod(method, typeModel);
-
-                if (methodModel == null)
-                {
-                    continue;
-                }
-
-                typeModel.Methods.Add(methodModel);
-            }
-
+            
             return typeModel;
+        }
+        
+        private string GetTypeName(TypeDefinition type)
+        {
+            return type.Name.GetString(Reader);
         }
 
         private NetType.TypeClass GetTypeClass(TypeDefinition type)
@@ -103,6 +101,43 @@
         private void SetBaseType(TypeDefinition type, NetType model)
         {
             model.BaseType = GetTypeFromEntityHandle(type.BaseType);
+        }
+
+        private bool IsGeneric(TypeDefinition type)
+        {
+            return type.GetGenericParameters().Any();
+        }
+
+        private IList<NetType> CreateGenericTypeArgs(TypeDefinition type, TypeKey typeKey)
+        {
+            return type.GetGenericParameters()
+                .Select(Reader.GetGenericParameter)
+                .Select(arg => CreateGenericTypeArg(arg, typeKey))
+                .ToList();
+        }
+
+        private NetType CreateGenericTypeArg(GenericParameter genericParameter, TypeKey typeKey)
+        {
+            var name = genericParameter.Name.GetString(Reader);
+
+            return Factory.CreateGenericTypeArg(typeKey, name);
+        }
+
+        private IEnumerable<NetMethod> CreateMethods(TypeDefinition type, NetType typeModel)
+        {
+            var methodScanner = new MethodScanner(Reader, Factory, Logger);
+
+            foreach (var method in type.GetMethods().Select(Reader.GetMethodDefinition))
+            {
+                var methodModel = methodScanner.ScanMethod(method, typeModel);
+
+                if (methodModel == null)
+                {
+                    continue;
+                }
+
+                yield return methodModel;
+            }
         }
 
         private void SetImplementedInterfaces(TypeDefinition type, NetType model)
@@ -165,7 +200,7 @@
         private NetType GetTypeFromMethodDefinitionHandle(MethodDefinitionHandle handle)
         {
                 var methodDefinition = Reader.GetMethodDefinition(handle);
-                return GetTypeFromEntityHandle((TypeDefinitionHandle)methodDefinition.GetDeclaringType());
+                return GetTypeFromEntityHandle(methodDefinition.GetDeclaringType());
         }
 
         private NetType GetTypeFromMemberReferenceHandle(MemberReferenceHandle handle)

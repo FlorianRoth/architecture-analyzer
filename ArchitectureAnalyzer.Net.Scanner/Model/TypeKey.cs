@@ -26,5 +26,15 @@
         {
             return new TypeKey(type.Namespace, type.Name);
         }
+
+        public static TypeKey FromTypeArgument(Type type, string typeArg)
+        {
+            return FromTypeArgument(FromType(type), typeArg);
+        }
+
+        public static TypeKey FromTypeArgument(TypeKey type, string typeArg)
+        {
+            return new TypeKey(type.Namespace, type.Name + "<" + typeArg + ">");
+        }
     }
 }

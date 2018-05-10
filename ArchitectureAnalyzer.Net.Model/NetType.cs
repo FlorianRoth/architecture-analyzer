@@ -29,7 +29,9 @@
         public bool IsStatic { get; set; }
 
         public bool IsSealed { get; set; }
-
+        
+        public bool IsGeneric { get; set; }
+        
         public bool HasAttribute { get; set; }
 
         [JsonIgnore]
@@ -44,11 +46,16 @@
         [JsonIgnore]
         public IList<NetMethod> Methods { get; set; }
 
+        [JsonIgnore]
+        public IList<NetType> GenericTypeArgs { get; set; }
+
         public NetType()
         {
+            Type = TypeClass.External;
             Implements = new List<NetType>();
             Attributes = new List<NetType>();
             Methods = new List<NetMethod>();
+            GenericTypeArgs = new List<NetType>();
         }
 
         public override string ToString()

@@ -38,6 +38,7 @@
                                         nameof(AbstractClass),
                                         nameof(ClassWithMembers),
                                         nameof(EmptyClass),
+                                        typeof(GenericClass<>).Name,
                                         nameof(IAgainExtendedInterface),
                                         nameof(IExtendedInterface),
                                         nameof(IInterface),

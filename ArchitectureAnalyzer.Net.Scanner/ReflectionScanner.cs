@@ -135,9 +135,10 @@
                 ConnectInterfaceImplementations(type);
                 ConnectMethods(type);
                 ConnectAttributes(type);
+                ConnectGenericTypeArgs(type);
             }
         }
-
+        
         private void ConnectTypeDefinitions(NetAssembly assembly, NetType type)
         {
             _db.CreateRelationship(assembly, type, Relationship.DEFINES_TYPE);
@@ -177,7 +178,7 @@
                 ConnectMethod(type, method);
             }
         }
-
+        
         private void ConnectMethod(NetType type, NetMethod method)
         {
             _db.CreateRelationship(type, method, Relationship.DEFINES_METHOD);
@@ -188,6 +189,14 @@
             {
                 var rel = new HasParameterRelationship { Order = order++ };
                 _db.CreateRelationship(method, param, Relationship.HAS_PARAMETER, rel);
+            }
+        }
+
+        private void ConnectGenericTypeArgs(NetType type)
+        {
+            foreach (var arg in type.GenericTypeArgs)
+            {
+                _db.CreateRelationship(type, arg, Relationship.DEFINES_TYPE_ARG);
             }
         }
     }

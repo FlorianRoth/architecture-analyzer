@@ -45,6 +45,17 @@
             return model;
         }
 
+        public NetType CreateGenericTypeArg(TypeKey key, string typeArgName)
+        {
+            var argKey = TypeKey.FromTypeArgument(key, typeArgName);
+
+            var model = _typeMap[argKey];
+            model.Name = argKey.Name;
+            model.Namespace = argKey.Namespace;
+
+            return model;
+        }
+
         public IEnumerable<NetAssembly> GetAssemblyModels()
         {
             return _assemblyMap.Models;

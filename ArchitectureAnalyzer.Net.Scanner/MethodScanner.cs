@@ -74,9 +74,7 @@
             var name = method.Name.GetString(Reader);
             var signatureTypeProvider = new SignatureTypeProvider(Factory);
             var signature = method.DecodeSignature(signatureTypeProvider, null);
-
-            var signatureString = CreateSignatureString(name, signature);
-
+            
             var methodModel = Factory.CreateMethodModel(new MethodKey(name));
             methodModel.Name = name;
             methodModel.IsAbstract = IsAbstract(method);
@@ -88,9 +86,9 @@
             return methodModel;
         }
 
-        private object CreateSignatureString(string name, MethodSignature<NetType> signature)
+        private string CreateSignatureString(NetType typeModel, string name, MethodSignature<NetType> signature)
         {
-            return $"{name}({string.Join(",", signature.ParameterTypes.Select(t => t.Id))}):{signature.ReturnType.Id}";
+            return $"{typeModel.Namespace}.{typeModel.Name}.{name}({string.Join(",", signature.ParameterTypes.Select(t => t.Id))}):{signature.ReturnType.Id}";
         }
 
         private static bool IsAbstract(MethodDefinition method)
