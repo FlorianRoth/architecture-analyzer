@@ -3,6 +3,7 @@
     using System;
     using System.IO;
     using System.Linq;
+    using System.Text.RegularExpressions;
 
     using ArchitectureAnalyzer.Net.Model;
     using ArchitectureAnalyzer.Net.Scanner.Model;
@@ -55,16 +56,25 @@
         protected NetType NetType<T>(string methodName, string typeArgName)
         {
             var typeKey = TypeKey.FromType<T>();
-            var methodKey = new MethodKey(typeKey, methodName);
-
-            var key = TypeKey.FromMethodParameter(methodKey, typeArgName);
             
-            return ModelFactory.GetTypeModels().FirstOrDefault(t => Equals(t.GetKey(), key));
+            return ModelFactory
+                .GetTypeModels()
+                .Where(t => t.Type == Net.Model.NetType.TypeClass.GenericTypeArg)
+                .Where(t => t.Namespace == typeKey.Namespace)
+                .FirstOrDefault(t => Regex.IsMatch(t.Name, typeKey.Name + @"\/" + methodName + @"\([0-9]+\)<" + typeArgName + ">"));
         }
 
         protected NetMethod NetMethod<T>(string methodName)
         {
-            return ModelFactory.GetMethodModels().FirstOrDefault(m => m.Name == methodName);
+            return ModelFactory.GetMethodModels().FirstOrDefault(m => Equals(m.DeclaringType, NetType<T>()) && m.Name == methodName);
+        }
+
+        protected NetMethodParameter NetMethodParameter<T>(string methodName, string parameterName)
+        {
+            var method = NetMethod<T>(methodName);
+
+            return ModelFactory.GetMethodParameterModels().FirstOrDefault(p => Equals(p.DeclaringMethod, method) && p.Name == parameterName);
+
         }
     }
 }

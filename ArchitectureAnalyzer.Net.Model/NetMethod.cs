@@ -19,16 +19,23 @@
         public bool IsGeneric { get; set; }
 
         [JsonIgnore]
+        public int Address { get; set; }
+
+        [JsonIgnore]
+        public NetType DeclaringType { get; set; }
+
+        [JsonIgnore]
         public NetType ReturnType { get; set; }
 
         [JsonIgnore]
-        public IReadOnlyList<NetType> ParameterTypes { get; set; }
+        public IReadOnlyList<NetMethodParameter> Parameters { get; set; }
 
         [JsonIgnore]
         public IReadOnlyList<NetType> GenericParameters { get; set; }
-
+        
         public NetMethod()
         {
+            Parameters = new List<NetMethodParameter>();
             GenericParameters = new List<NetType>();
         }
 

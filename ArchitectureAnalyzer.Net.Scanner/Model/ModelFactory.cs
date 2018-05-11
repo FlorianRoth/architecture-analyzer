@@ -13,11 +13,14 @@
 
         private readonly ModelMap<MethodKey, NetMethod> _methodMap;
 
+        private readonly ModelMap<MethodParameterKey, NetMethodParameter> _methodParameterMap;
+
         public ModelFactory()
         {
             _assemblyMap = new ModelMap<AssemblyKey, NetAssembly>();
             _typeMap = new ModelMap<TypeKey, NetType>();
             _methodMap = new ModelMap<MethodKey, NetMethod>();
+            _methodParameterMap = new ModelMap<MethodParameterKey, NetMethodParameter>();
         }
 
         public NetAssembly CreateAssemblyModel(AssemblyKey key)
@@ -32,6 +35,7 @@
         {
             var model = _typeMap[key];
             model.Name = key.Name;
+            model.DisplayName = key.Name;
             model.Namespace = key.Namespace;
 
             return model;
@@ -45,6 +49,14 @@
             return model;
         }
 
+        public NetMethodParameter CreateMethodParameter(MethodParameterKey key)
+        {
+            var model = _methodParameterMap[key];
+            model.Name = key.Name;
+
+            return model;
+        }
+
         public NetType CreateGenericTypeArg(TypeKey key, string typeArgName)
         {
             var argKey = TypeKey.FromTypeArgument(key, typeArgName);
@@ -52,17 +64,21 @@
             var model = _typeMap[argKey];
             model.Name = argKey.Name;
             model.Namespace = argKey.Namespace;
+            model.DisplayName = typeArgName;
+            model.Type = NetType.TypeClass.GenericTypeArg;
 
             return model;
         }
 
         public NetType CreateGenericParameter(MethodKey key, string typeArgName)
         {
-            var argKey = TypeKey.FromMethodParameter(key, typeArgName);
+            var argKey = TypeKey.FromMethodTypeParameter(key, typeArgName);
 
             var model = _typeMap[argKey];
             model.Name = argKey.Name;
             model.Namespace = argKey.Namespace;
+            model.DisplayName = typeArgName;
+            model.Type = NetType.TypeClass.GenericTypeArg;
 
             return model;
         }
@@ -80,6 +96,11 @@
         public IEnumerable<NetMethod> GetMethodModels()
         {
             return _methodMap.Models;
+        }
+
+        public IEnumerable<NetMethodParameter> GetMethodParameterModels()
+        {
+            return _methodParameterMap.Models;
         }
 
         private class ModelMap<TKey, TNode> where TNode : Node, new()

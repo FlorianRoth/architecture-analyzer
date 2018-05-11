@@ -34,8 +34,6 @@
 
             var typeModel = Factory.CreateTypeModel(typeKey);
             typeModel.Type = GetTypeClass(type);
-            typeModel.Name = GetTypeName(type);
-            typeModel.Namespace = type.Namespace.GetString(Reader);
             typeModel.IsStatic = IsStatic(type);
             typeModel.IsAbstract = IsAbstract(type);
             typeModel.IsSealed = IsSealed(type);
@@ -43,7 +41,8 @@
             typeModel.IsGeneric = IsGeneric(type);
             typeModel.GenericTypeArgs = CreateGenericTypeArgs(type, typeKey);
             typeModel.Methods = CreateMethods(type, typeModel).ToList();
-            
+            typeModel.DisplayName = GetDisplayName(typeModel);
+
             SetBaseType(type, typeModel);
             SetImplementedInterfaces(type, typeModel);
             SetAttributes(type, typeModel);
@@ -51,9 +50,16 @@
             return typeModel;
         }
         
-        private string GetTypeName(TypeDefinition type)
+        private string GetDisplayName(NetType typeModel)
         {
-            return type.Name.GetString(Reader);
+            var displayName = typeModel.Name;
+
+            if (typeModel.IsGeneric)
+            {
+                displayName = displayName.Substring(0, displayName.LastIndexOf('`'));
+            }
+
+            return displayName;
         }
 
         private NetType.TypeClass GetTypeClass(TypeDefinition type)

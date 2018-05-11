@@ -12,6 +12,8 @@
 
         NetMethod CreateMethodModel(MethodKey key);
 
+        NetMethodParameter CreateMethodParameter(MethodParameterKey key);
+
         NetType CreateGenericTypeArg(TypeKey key, string typeArgName);
 
         NetType CreateGenericParameter(MethodKey key, string typeArgName);
@@ -21,5 +23,7 @@
         IEnumerable<NetType> GetTypeModels();
         
         IEnumerable<NetMethod> GetMethodModels();
+
+        IEnumerable<NetMethodParameter> GetMethodParameterModels();
     }
 }

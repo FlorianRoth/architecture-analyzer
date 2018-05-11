@@ -142,28 +142,50 @@
         }
 
         [Test]
+        public void MethodParameterIsAddedToDatabase()
+        {
+            _scanner.Scan();
+
+            AssertNodeInDatabase(NetMethodParameter<ClassWithMembers>(nameof(ClassWithMembers.MethodWithParams), "a"));
+        }
+
+        [Test]
         public void ParametersAreLinkedToMethod()
         {
             _scanner.Scan();
 
             AssertRelationshipInDatabase(
                 NetMethod<ClassWithMembers>(nameof(ClassWithMembers.MethodWithParams)),
-                NetType<int>(),
-                Relationship.HAS_PARAMETER,
-                new HasParameterRelationship(0));
+                NetMethodParameter<ClassWithMembers>(nameof(ClassWithMembers.MethodWithParams), "a"),
+                Relationship.DEFINES_PARAMETER);
 
             AssertRelationshipInDatabase(
                 NetMethod<ClassWithMembers>(nameof(ClassWithMembers.MethodWithParams)),
+                NetMethodParameter<ClassWithMembers>(nameof(ClassWithMembers.MethodWithParams), "b"),
+                Relationship.DEFINES_PARAMETER);
+        }
+
+        [Test]
+        public void TypesAreLinkedToMethodParameter()
+        {
+            _scanner.Scan();
+
+            AssertRelationshipInDatabase(
+                NetMethodParameter<ClassWithMembers>(nameof(ClassWithMembers.MethodWithParams), "a"),
+                NetType<int>(),
+                Relationship.HAS_TYPE);
+
+            AssertRelationshipInDatabase(
+                NetMethodParameter<ClassWithMembers>(nameof(ClassWithMembers.MethodWithParams), "b"),
                 NetType<string>(),
-                Relationship.HAS_PARAMETER,
-                new HasParameterRelationship(1));
+                Relationship.HAS_TYPE);
         }
 
         [Test]
         public void GenericParametersAreLinkedToMethod()
         {
             _scanner.Scan();
-
+            
             AssertRelationshipInDatabase(
                 NetMethod<ClassWithMembers>(nameof(ClassWithMembers.GenericMethod)),
                 NetType<ClassWithMembers>(nameof(ClassWithMembers.GenericMethod), "TMethodArg"),

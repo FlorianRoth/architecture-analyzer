@@ -14,13 +14,16 @@
             External,
             Class,
             Interface,
-            Enum
+            Enum,
+            GenericTypeArg
         }
 
         [JsonConverter(typeof(StringEnumConverter))]
         public TypeClass Type { get; set; }
 
         public string Name { get; set; }
+
+        public string DisplayName { get; set; }
 
         public string Namespace { get; set; }
 

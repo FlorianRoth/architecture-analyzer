@@ -112,6 +112,12 @@
             {
                 _db.CreateNode(model);
             }
+
+            _logger.LogInformation("  Creating method parameter nodes");
+            foreach (var model in _factory.GetMethodParameterModels())
+            {
+                _db.CreateNode(model);
+            }
         }
 
         private void ConnectAssemblyReferences(NetAssembly assembly)
@@ -190,14 +196,17 @@
         
         private void ConnectMethodParameters(NetMethod method)
         {
-            var order = 0;
-            foreach (var param in method.ParameterTypes)
+            foreach (var param in method.Parameters)
             {
                 _db.CreateRelationship(
                     method,
                     param,
-                    Relationship.HAS_PARAMETER,
-                    new HasParameterRelationship(order++));
+                    Relationship.DEFINES_PARAMETER);
+
+                _db.CreateRelationship(
+                    param,
+                    param.Type,
+                    Relationship.HAS_TYPE);
             }
         }
 

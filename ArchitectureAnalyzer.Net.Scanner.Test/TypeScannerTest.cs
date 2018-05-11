@@ -183,6 +183,7 @@
             Assert.That(model.GenericTypeArgs.Count, Is.EqualTo(1));
 
             Assert.That(model.GenericTypeArgs[0].Name, Is.EqualTo(typeof(GenericClass<>).Name + "<TTypeArg>"));
+            Assert.That(model.GenericTypeArgs[0].Type, Is.EqualTo(Net.Model.NetType.TypeClass.GenericTypeArg));
         }
     }
 }

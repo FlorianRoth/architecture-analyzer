@@ -48,10 +48,15 @@
 
             var model = _scanner.ScanMethod(method, NetType<ClassWithMembers>());
             
-            Assert.That(model.ParameterTypes.Count, Is.EqualTo(2));
+            Assert.That(model.Parameters.Count, Is.EqualTo(2));
 
-            Assert.That(model.ParameterTypes[0].Name, Is.EqualTo(nameof(Int32)));
-            Assert.That(model.ParameterTypes[1].Name, Is.EqualTo(nameof(String)));
+            Assert.That(model.Parameters[0].Name, Is.EqualTo("a"));
+            Assert.That(model.Parameters[0].Order, Is.EqualTo(0));
+            Assert.That(model.Parameters[0].Type.Name, Is.EqualTo(nameof(Int32)));
+
+            Assert.That(model.Parameters[1].Name, Is.EqualTo("b"));
+            Assert.That(model.Parameters[1].Order, Is.EqualTo(1));
+            Assert.That(model.Parameters[1].Type.Name, Is.EqualTo(nameof(String)));
         }
 
         [Test]
@@ -63,7 +68,8 @@
 
             Assert.That(model.GenericParameters.Count, Is.EqualTo(1));
             
-            Assert.That(model.GenericParameters[0].Name, Is.EqualTo(nameof(ClassWithMembers) + "/GenericMethod<TMethodArg>"));
+            Assert.That(model.GenericParameters[0].Name, Is.EqualTo(nameof(ClassWithMembers) + "/GenericMethod(153)<TMethodArg>"));
+            Assert.That(model.GenericParameters[0].Type, Is.EqualTo(Net.Model.NetType.TypeClass.GenericTypeArg));
         }
 
         [Test]

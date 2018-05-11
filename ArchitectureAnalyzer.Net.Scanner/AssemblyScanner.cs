@@ -25,7 +25,6 @@ namespace ArchitectureAnalyzer.Net.Scanner
             var name = assembly.Name.GetString(Reader);
 
             var assemblyModel = Factory.CreateAssemblyModel(AssemblyKey(name));
-            assemblyModel.Name = name;
             
             assemblyModel.References = Reader.AssemblyReferences
                 .Select(Reader.GetAssemblyReference)

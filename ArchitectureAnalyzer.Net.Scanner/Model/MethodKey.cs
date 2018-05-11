@@ -6,10 +6,13 @@
 
         public string Name { get; }
 
-        public MethodKey(TypeKey declaringType, string name)
+        public int SignatureHash { get; }
+
+        public MethodKey(TypeKey declaringType, string name, int signatureHash)
         {
             DeclaringType = declaringType;
             Name = name;
+            SignatureHash = signatureHash;
         }
     }
 }

@@ -70,24 +70,55 @@
             {
                 return null;
             }
-
-            var name = method.Name.GetString(Reader);
-            var signatureTypeProvider = new SignatureTypeProvider(Factory);
-            var signature = method.DecodeSignature(signatureTypeProvider, typeModel);
-
-            var key = new MethodKey(typeModel.GetKey(), name);
+            
+            var key = new MethodKey(
+                typeModel.GetKey(),
+                method.Name.GetString(Reader),
+                method.Signature.GetHashCode());
 
             var methodModel = Factory.CreateMethodModel(key);
-            methodModel.Name = name;
+            methodModel.DeclaringType = typeModel;
             methodModel.IsAbstract = IsAbstract(method);
             methodModel.IsStatic = IsStatic(method);
             methodModel.IsSealed = IsSealed(method);
             methodModel.IsGeneric = IsGeneric(method);
             methodModel.GenericParameters = CreateGenericParameters(method, key);
+
+            var signatureTypeProvider = new SignatureTypeProvider(Factory);
+            var signature = method.DecodeSignature(signatureTypeProvider, methodModel);
+
             methodModel.ReturnType = signature.ReturnType;
-            methodModel.ParameterTypes = signature.ParameterTypes;
+            methodModel.Parameters = CreateParameters(method, methodModel, signature.ParameterTypes);
             
             return methodModel;
+        }
+
+        private IReadOnlyList<NetMethodParameter> CreateParameters(
+            MethodDefinition method,
+            NetMethod methodModel,
+            IReadOnlyList<NetType> signatureParameterTypes)
+        {
+            return method.GetParameters()
+                .Select(Reader.GetParameter)
+                .Select((param, order) => CreateParameter(param, order, methodModel, signatureParameterTypes[order]))
+                .ToList();
+        }
+
+        private NetMethodParameter CreateParameter(
+            Parameter param,
+            int order,
+            NetMethod methodModel,
+            NetType parameterType)
+        {
+            var name = param.Name.GetString(Reader);
+            var key = new MethodParameterKey(methodModel.Id, name);
+
+            var model = Factory.CreateMethodParameter(key);
+            model.Order = order;
+            model.Type = parameterType;
+            model.DeclaringMethod = methodModel;
+
+            return model;
         }
 
         private IReadOnlyList<NetType> CreateGenericParameters(MethodDefinition method, MethodKey methodKey)
