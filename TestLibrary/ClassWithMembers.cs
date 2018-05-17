@@ -16,6 +16,8 @@
 
         public string Property { get; set; }
 
+        public int InternalProperty { get; set; }
+
         public event EventHandler Event;
 
         public void SomeMethod()

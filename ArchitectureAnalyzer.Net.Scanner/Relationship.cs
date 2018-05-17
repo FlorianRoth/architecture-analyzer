@@ -7,6 +7,8 @@ namespace ArchitectureAnalyzer.Net.Scanner
 
         public const string DEFINES_METHOD = "DEFINES_METHOD";
 
+        public const string DEFINES_PROPERTY = "DEFINES_PROPERTY";
+
         public const string DEFINES_PARAMETER = "DEFINES_PARAMETER";
 
         public const string DEFINES_GENERIC_TYPE_ARG = "DEFINES_GENERIC_TYPE_ARG";

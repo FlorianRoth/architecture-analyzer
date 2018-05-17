@@ -74,7 +74,11 @@
             var method = NetMethod<T>(methodName);
 
             return ModelFactory.GetMethodParameterModels().FirstOrDefault(p => Equals(p.DeclaringMethod, method) && p.Name == parameterName);
+        }
 
+        protected NetProperty NetProperty<T>(string propertyName)
+        {
+            return ModelFactory.GetPropertyModels().FirstOrDefault(m => Equals(m.DeclaringType, NetType<T>()) && m.Name == propertyName);
         }
     }
 }

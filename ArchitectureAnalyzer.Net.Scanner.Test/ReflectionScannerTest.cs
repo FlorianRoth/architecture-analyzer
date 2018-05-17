@@ -230,6 +230,37 @@
                 NetMethod<InheritedFromClassWithMembers>(".ctor"));
         }
 
+        [Test]
+        public void PropertyIsLinkedToDeclaringClass()
+        {
+            _scanner.Scan();
+
+            AssertRelationshipInDatabase(
+                NetType<ClassWithMembers>(),
+                NetProperty<ClassWithMembers>(nameof(ClassWithMembers.Property)),
+                Relationship.DEFINES_PROPERTY);
+        }
+
+        [Test]
+        public void PropertyTypeIsLinkedToProperty()
+        {
+            _scanner.Scan();
+
+            AssertRelationshipInDatabase(
+                NetProperty<ClassWithMembers>(nameof(ClassWithMembers.Property)),
+                NetType<string>(),
+                Relationship.HAS_TYPE);
+        }
+
+        [Test]
+        public void PublicPropertyIsAddedToDatabase()
+        {
+            _scanner.Scan();
+
+            AssertNodeInDatabase(
+                NetProperty<ClassWithMembers>(nameof(ClassWithMembers.Property)));
+        }
+
         [TestCase("get_")]
         [TestCase("set_")]
         public void PropertyAccessorIsNotAddedToDatabase(string accessor)
@@ -268,9 +299,7 @@
         public void GenericTypeArgumentIsLinked()
         {
             _scanner.Scan();
-
-            var from = NetType(typeof(GenericClass<>));
-
+            
             AssertRelationshipInDatabase(
                 NetType(typeof(GenericClass<>)),
                 NetType(typeof(GenericClass<>), "TTypeArg"),

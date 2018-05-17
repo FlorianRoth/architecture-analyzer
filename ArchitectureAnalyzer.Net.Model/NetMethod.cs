@@ -6,7 +6,7 @@
 
     using Newtonsoft.Json;
 
-    public class NetMethod : Node
+    public class NetMethod : Node, IGenericContext
     {
         public string Name { get; set; }
 

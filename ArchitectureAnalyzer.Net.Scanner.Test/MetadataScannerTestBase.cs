@@ -6,6 +6,8 @@
     using System.Reflection.Metadata;
     using System.Reflection.PortableExecutable;
 
+    using ArchitectureAnalyzer.Net.Scanner.Utils;
+
     using NUnit.Framework;
 
     public abstract class MetadataScannerTestBase : ScannerTestBase
@@ -53,9 +55,9 @@
         {
             return MetadataReader.MethodDefinitions
                 .Select(MetadataReader.GetMethodDefinition)
-                .First(MatchTypeDefinitionHandle);
+                .First(MatchTypeDefinition);
 
-            bool MatchTypeDefinitionHandle(MethodDefinition method)
+            bool MatchTypeDefinition(MethodDefinition method)
             {
                 var declaringType = method.GetDeclaringType();
                 var typeName = GetString(MetadataReader.GetTypeDefinition(declaringType).Name);
@@ -72,6 +74,15 @@
 
                 return true;
             }
+        }
+
+        protected PropertyDefinition GetPropertyDefinition<T>(string propertyName)
+        {
+            var typeDefinition = GetTypeDefintion<T>();
+            
+            return typeDefinition.GetProperties()
+                .Select(MetadataReader.GetPropertyDefinition)
+                .First(property => GetString(property.Name) == propertyName);
         }
     }
 }

@@ -118,6 +118,12 @@
             {
                 _db.CreateNode(model);
             }
+
+            _logger.LogInformation("  Creating property nodes");
+            foreach (var model in _factory.GetPropertyModels())
+            {
+                _db.CreateNode(model);
+            }
         }
 
         private void ConnectAssemblyReferences(NetAssembly assembly)
@@ -140,6 +146,7 @@
                 ConnectBaseType(type);
                 ConnectInterfaceImplementations(type);
                 ConnectMethods(type);
+                ConnectProperties(type);
                 ConnectAttributes(type);
                 ConnectGenericTypeArgs(type);
             }
@@ -224,6 +231,21 @@
             {
                 _db.CreateRelationship(type, arg, Relationship.DEFINES_GENERIC_TYPE_ARG);
             }
+        }
+
+
+        private void ConnectProperties(NetType type)
+        {
+            foreach (var property in type.Properties)
+            {
+                ConnectProperty(type, property);
+            }
+        }
+
+        private void ConnectProperty(NetType type, NetProperty property)
+        {
+            _db.CreateRelationship(type, property, Relationship.DEFINES_PROPERTY);
+            _db.CreateRelationship(property, property.Type, Relationship.HAS_TYPE);
         }
     }
 }

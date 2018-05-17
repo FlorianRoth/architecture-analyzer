@@ -15,12 +15,15 @@
 
         private readonly ModelMap<MethodParameterKey, NetMethodParameter> _methodParameterMap;
 
+        private readonly ModelMap<PropertyKey, NetProperty> _propertyMap;
+
         public ModelFactory()
         {
             _assemblyMap = new ModelMap<AssemblyKey, NetAssembly>();
             _typeMap = new ModelMap<TypeKey, NetType>();
             _methodMap = new ModelMap<MethodKey, NetMethod>();
             _methodParameterMap = new ModelMap<MethodParameterKey, NetMethodParameter>();
+            _propertyMap = new ModelMap<PropertyKey, NetProperty>();
         }
 
         public NetAssembly CreateAssemblyModel(AssemblyKey key)
@@ -83,6 +86,14 @@
             return model;
         }
 
+        public NetProperty CreatePropertyModel(PropertyKey key)
+        {
+            var model = _propertyMap[key];
+            model.Name = key.Name;
+
+            return model;
+        }
+
         public IEnumerable<NetAssembly> GetAssemblyModels()
         {
             return _assemblyMap.Models;
@@ -101,6 +112,11 @@
         public IEnumerable<NetMethodParameter> GetMethodParameterModels()
         {
             return _methodParameterMap.Models;
+        }
+
+        public IEnumerable<NetProperty> GetPropertyModels()
+        {
+            return _propertyMap.Models;
         }
 
         private class ModelMap<TKey, TNode> where TNode : Node, new()

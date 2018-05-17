@@ -18,6 +18,8 @@
 
         NetType CreateGenericParameter(MethodKey key, string typeArgName);
 
+        NetProperty CreatePropertyModel(PropertyKey key);
+
         IEnumerable<NetAssembly> GetAssemblyModels();
         
         IEnumerable<NetType> GetTypeModels();
@@ -25,5 +27,7 @@
         IEnumerable<NetMethod> GetMethodModels();
 
         IEnumerable<NetMethodParameter> GetMethodParameterModels();
+
+        IEnumerable<NetProperty> GetPropertyModels();
     }
 }

@@ -1,10 +1,9 @@
 ﻿
-namespace ArchitectureAnalyzer.DotnetScanner
+namespace ArchitectureAnalyzer.Net.Scanner
 {
     using System;
 
     using ArchitectureAnalyzer.Core.Scanner;
-    using ArchitectureAnalyzer.Net.Scanner;
     using ArchitectureAnalyzer.Net.Scanner.Model;
 
     using Microsoft.Extensions.DependencyInjection;

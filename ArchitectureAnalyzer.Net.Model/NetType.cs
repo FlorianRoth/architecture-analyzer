@@ -50,6 +50,9 @@
         public IList<NetMethod> Methods { get; set; }
 
         [JsonIgnore]
+        public IList<NetProperty> Properties { get; set; }
+
+        [JsonIgnore]
         public IList<NetType> GenericTypeArgs { get; set; }
 
         public NetType()
@@ -58,6 +61,7 @@
             Implements = new List<NetType>();
             Attributes = new List<NetType>();
             Methods = new List<NetMethod>();
+            Properties = new List<NetProperty>();
             GenericTypeArgs = new List<NetType>();
         }
 

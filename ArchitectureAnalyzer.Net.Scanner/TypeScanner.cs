@@ -41,6 +41,7 @@
             typeModel.IsGeneric = IsGeneric(type);
             typeModel.GenericTypeArgs = CreateGenericTypeArgs(type, typeKey);
             typeModel.Methods = CreateMethods(type, typeModel).ToList();
+            typeModel.Properties = CreateProperties(type, typeModel).ToList();
             typeModel.DisplayName = GetDisplayName(typeModel);
 
             SetBaseType(type, typeModel);
@@ -49,7 +50,7 @@
             
             return typeModel;
         }
-        
+
         private string GetDisplayName(NetType typeModel)
         {
             var displayName = typeModel.Name;
@@ -145,6 +146,24 @@
                 yield return methodModel;
             }
         }
+
+        private IEnumerable<NetProperty> CreateProperties(TypeDefinition type, NetType typeModel)
+        {
+            var propertyScanner = new PropertyScanner(Reader, Factory, Logger);
+
+            foreach (var property in type.GetProperties().Select(Reader.GetPropertyDefinition))
+            {
+                var propertyModel = propertyScanner.ScanProperty(property, typeModel);
+
+                if (propertyModel == null)
+                {
+                    continue;
+                }
+
+                yield return propertyModel;
+            }
+        }
+
 
         private void SetImplementedInterfaces(TypeDefinition type, NetType model)
         {

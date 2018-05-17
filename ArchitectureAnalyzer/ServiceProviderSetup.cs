@@ -4,7 +4,6 @@ namespace ArchitectureAnalyzer
     using System;
 
     using ArchitectureAnalyzer.Core;
-    using ArchitectureAnalyzer.DotnetScanner;
     using ArchitectureAnalyzer.Neo4j;
     using ArchitectureAnalyzer.Neo4j.Graph;
     using ArchitectureAnalyzer.Net.Scanner;
