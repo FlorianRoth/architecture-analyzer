@@ -1,6 +1,7 @@
 ﻿namespace ArchitectureAnalyzer.Net.Model
 {
     using System.Collections.Generic;
+    using System.Linq;
 
     using ArchitectureAnalyzer.Core.Graph;
 
@@ -32,10 +33,10 @@
         public bool IsStatic { get; set; }
 
         public bool IsSealed { get; set; }
-        
-        public bool IsGeneric { get; set; }
-        
-        public bool HasAttribute { get; set; }
+
+        public bool IsGeneric => GenericTypeArgs.Any();
+
+        public bool HasAttributes => Attributes.Any();
         
         [JsonConverter(typeof(StringEnumConverter))]
         public Visibility Visibility { get; set; }

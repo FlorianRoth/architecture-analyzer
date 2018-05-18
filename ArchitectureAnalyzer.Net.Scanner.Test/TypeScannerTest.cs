@@ -57,7 +57,7 @@
             Assert.That(model.IsStatic, Is.False);
             Assert.That(model.IsAbstract, Is.False);
             Assert.That(model.IsSealed, Is.False);
-            Assert.That(model.HasAttribute, Is.False);
+            Assert.That(model.HasAttributes, Is.False);
             Assert.That(model.IsGeneric, Is.False);
         }
 
@@ -71,7 +71,7 @@
             Assert.That(model.IsStatic, Is.True);
             Assert.That(model.IsAbstract, Is.False);
             Assert.That(model.IsSealed, Is.False);
-            Assert.That(model.HasAttribute, Is.False);
+            Assert.That(model.HasAttributes, Is.False);
             Assert.That(model.IsGeneric, Is.False);
         }
 
@@ -85,7 +85,7 @@
             Assert.That(model.IsStatic, Is.False);
             Assert.That(model.IsAbstract, Is.True);
             Assert.That(model.IsSealed, Is.False);
-            Assert.That(model.HasAttribute, Is.False);
+            Assert.That(model.HasAttributes, Is.False);
             Assert.That(model.IsGeneric, Is.False);
         }
 
@@ -99,7 +99,7 @@
             Assert.That(model.IsStatic, Is.False);
             Assert.That(model.IsAbstract, Is.False);
             Assert.That(model.IsSealed, Is.True);
-            Assert.That(model.HasAttribute, Is.False);
+            Assert.That(model.HasAttributes, Is.False);
             Assert.That(model.IsGeneric, Is.False);
         }
 
@@ -113,7 +113,7 @@
             Assert.That(model.IsStatic, Is.False);
             Assert.That(model.IsAbstract, Is.False);
             Assert.That(model.IsSealed, Is.False);
-            Assert.That(model.HasAttribute, Is.True);
+            Assert.That(model.HasAttributes, Is.True);
             Assert.That(model.IsGeneric, Is.False);
         }
 
@@ -128,7 +128,7 @@
             Assert.That(model.IsAbstract, Is.False);
             Assert.That(model.IsSealed, Is.False);
             Assert.That(model.IsGeneric, Is.False);
-            Assert.That(model.HasAttribute, Is.True);
+            Assert.That(model.HasAttributes, Is.True);
         }
 
         [Test]
@@ -142,7 +142,7 @@
             Assert.That(model.IsAbstract, Is.False);
             Assert.That(model.IsSealed, Is.False);
             Assert.That(model.IsGeneric, Is.True);
-            Assert.That(model.HasAttribute, Is.False);
+            Assert.That(model.HasAttributes, Is.False);
         }
 
         [Test]

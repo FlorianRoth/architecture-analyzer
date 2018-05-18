@@ -48,27 +48,7 @@
 
         private Visibility GetVisibility(MethodDefinition method)
         {
-            if (method.Attributes.HasFlag(MethodAttributes.Public))
-            {
-                return Visibility.Public;
-            }
-
-            if (method.Attributes.HasFlag(MethodAttributes.Assembly))
-            {
-                return Visibility.Internal;
-            }
-
-            if (method.Attributes.HasFlag(MethodAttributes.Family))
-            {
-                return Visibility.Protected;
-            }
-
-            if (method.Attributes.HasFlag(MethodAttributes.Private))
-            {
-                return Visibility.Private;
-            }
-
-            throw new ArgumentOutOfRangeException();
+            return method.Attributes.ToVisibility();
         }
 
         private IReadOnlyList<NetMethodParameter> CreateParameters(

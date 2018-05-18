@@ -1,6 +1,7 @@
 ﻿
 namespace ArchitectureAnalyzer.Net.Scanner
 {
+    using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
     using System.Reflection.Metadata;
@@ -27,25 +28,35 @@ namespace ArchitectureAnalyzer.Net.Scanner
 
             var assemblyModel = Factory.CreateAssemblyModel(AssemblyKey(name));
             
-            assemblyModel.References = Reader.AssemblyReferences
+            assemblyModel.References = CreateAssemblyReferences();
+            assemblyModel.DefinedTypes = CreateTypes();
+            
+            return assemblyModel;
+        }
+
+        private List<NetAssembly> CreateAssemblyReferences()
+        {
+            return Reader.AssemblyReferences
                 .Select(Reader.GetAssemblyReference)
                 .Select(CreateAssemblyModel)
                 .ToList();
-            
+        }
+
+        private NetAssembly CreateAssemblyModel(AssemblyReference assemblyReference)
+        {
+            var key = AssemblyKey(assemblyReference.Name.GetString(Reader));
+            return Factory.CreateAssemblyModel(key);
+        }
+
+        private IList<NetType> CreateTypes()
+        {
             var typeScanner = new TypeScanner(Reader, Factory, Logger);
 
-            var types = Reader.TypeDefinitions
+            return Reader.TypeDefinitions
                 .Select(Reader.GetTypeDefinition)
-                .Where(IncludeType);
-
-            foreach (var type in types)
-            {
-                var typeModel = typeScanner.ScanType(type);
-                
-                assemblyModel.DefinedTypes.Add(typeModel);
-            }
-
-            return assemblyModel;
+                .Where(IncludeType)
+                .Select(type => typeScanner.ScanType(type))
+                .ToList();
         }
 
         private bool IncludeType(TypeDefinition type)
@@ -62,12 +73,6 @@ namespace ArchitectureAnalyzer.Net.Scanner
             }
 
             return true;
-        }
-
-        private NetAssembly CreateAssemblyModel(AssemblyReference assemblyReference)
-        {
-            var key = AssemblyKey(assemblyReference.Name.GetString(Reader));
-            return Factory.CreateAssemblyModel(key);
         }
     }
 }

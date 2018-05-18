@@ -20,11 +20,6 @@
         {
             Logger.LogTrace("    Scanning property '{0}'", property.Name.GetString(Reader));
 
-            if (IncludeProperty(property) == false)
-            {
-                return null;
-            }
-
             var key = new PropertyKey(
                 typeModel.GetKey(),
                 property.Name.GetString(Reader));
@@ -38,11 +33,6 @@
             propertyModel.Type = signature.ReturnType;
 
             return propertyModel;
-        }
-
-        private bool IncludeProperty(PropertyDefinition property)
-        {
-            return !property.Attributes.HasFlag(PropertyAttributes.SpecialName);
         }
     }
 }

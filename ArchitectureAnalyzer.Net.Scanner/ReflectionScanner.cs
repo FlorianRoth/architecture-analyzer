@@ -42,7 +42,7 @@
 
             var scannedAssemblies = ScanAssemblies();
 
-            CreateNodes(scannedAssemblies);
+            CreateAllNodes(scannedAssemblies);
 
             foreach (var assemblyModel in scannedAssemblies)
             {
@@ -91,36 +91,22 @@
             }
         }
 
-        private void CreateNodes(IEnumerable<NetAssembly> scannedAssemblies)
+        private void CreateAllNodes(IEnumerable<NetAssembly> scannedAssemblies)
         {
             _logger.LogInformation("Adding nodes to database");
 
-            _logger.LogInformation("  Creating assembly nodes");
-            foreach (var model in scannedAssemblies)
-            {
-                _db.CreateNode(model);
-            }
+            CreateNodes(scannedAssemblies);
+            CreateNodes(_factory.GetTypeModels());
+            CreateNodes(_factory.GetMethodModels());
+            CreateNodes(_factory.GetMethodParameterModels());
+            CreateNodes(_factory.GetPropertyModels());
+        }
 
-            _logger.LogInformation("  Creating type nodes");
-            foreach (var model in _factory.GetTypeModels())
-            {
-                _db.CreateNode(model);
-            }
-
-            _logger.LogInformation("  Creating method nodes");
-            foreach (var model in _factory.GetMethodModels())
-            {
-                _db.CreateNode(model);
-            }
-
-            _logger.LogInformation("  Creating method parameter nodes");
-            foreach (var model in _factory.GetMethodParameterModels())
-            {
-                _db.CreateNode(model);
-            }
-
-            _logger.LogInformation("  Creating property nodes");
-            foreach (var model in _factory.GetPropertyModels())
+        private void CreateNodes<TNode>(IEnumerable<TNode> nodes)
+            where TNode : Node
+        {
+            _logger.LogInformation("  Creating {0} nodes", typeof(TNode).Name);
+            foreach (var model in nodes)
             {
                 _db.CreateNode(model);
             }
@@ -232,8 +218,7 @@
                 _db.CreateRelationship(type, arg, Relationship.DEFINES_GENERIC_TYPE_ARG);
             }
         }
-
-
+        
         private void ConnectProperties(NetType type)
         {
             foreach (var property in type.Properties)

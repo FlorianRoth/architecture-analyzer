@@ -33,16 +33,13 @@
             typeModel.IsStatic = IsStatic(type);
             typeModel.IsAbstract = IsAbstract(type);
             typeModel.IsSealed = IsSealed(type);
-            typeModel.HasAttribute = HasAttribute(type);
-            typeModel.IsGeneric = IsGeneric(type);
             typeModel.GenericTypeArgs = CreateGenericTypeArgs(type, typeKey);
-            typeModel.Methods = CreateMethods(type, typeModel).ToList();
-            typeModel.Properties = CreateProperties(type, typeModel).ToList();
+            typeModel.Methods = CreateMethods(type, typeModel);
+            typeModel.Properties = CreateProperties(type, typeModel);
             typeModel.DisplayName = GetDisplayName(typeModel);
-
-            SetBaseType(type, typeModel);
-            SetImplementedInterfaces(type, typeModel);
-            SetAttributes(type, typeModel);
+            typeModel.Implements = GetImplementedInterfaces(type);
+            typeModel.Attributes = GetAttributes(type);
+            typeModel.BaseType = GetBaseType(type);
             
             return typeModel;
         }
@@ -79,30 +76,7 @@
         
         private Visibility GetVisibility(TypeDefinition type)
         {
-            var visibility = type.Attributes & TypeAttributes.VisibilityMask;
-
-            switch (visibility)
-            {
-                case TypeAttributes.Public:
-                case TypeAttributes.NestedPublic:
-                    return Visibility.Public;
-
-                case TypeAttributes.NotPublic:
-                    return Visibility.Internal;
-
-
-                case TypeAttributes.NestedAssembly:
-                    return Visibility.Internal;
-
-                case TypeAttributes.NestedFamily:
-                    return Visibility.Protected;
-
-                case TypeAttributes.NestedPrivate:
-                    return Visibility.Private;
-                    
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+            return type.Attributes.ToVisibility();
         }
 
         private static bool IsSealed(TypeDefinition type)
@@ -110,13 +84,7 @@
             var atts = type.Attributes;
             return atts.HasFlag(TypeAttributes.Sealed) && !atts.HasFlag(TypeAttributes.Abstract);
         }
-
-        private bool HasAttribute(TypeDefinition type)
-        {
-            var atts = type.GetCustomAttributes();
-            return atts.Any();
-        }
-
+        
         private static bool IsStatic(TypeDefinition type)
         {
             var atts = type.Attributes;
@@ -129,16 +97,11 @@
             return !atts.HasFlag(TypeAttributes.Sealed) && atts.HasFlag(TypeAttributes.Abstract);
         }
 
-        private void SetBaseType(TypeDefinition type, NetType model)
+        private NetType GetBaseType(TypeDefinition type)
         {
-            model.BaseType = GetTypeFromEntityHandle(type.BaseType);
+            return GetTypeFromEntityHandle(type.BaseType);
         }
-
-        private bool IsGeneric(TypeDefinition type)
-        {
-            return type.GetGenericParameters().Any();
-        }
-
+        
         private IList<NetType> CreateGenericTypeArgs(TypeDefinition type, TypeKey typeKey)
         {
             return type.GetGenericParameters()
@@ -154,25 +117,15 @@
             return Factory.CreateGenericTypeArg(typeKey, name);
         }
 
-        private IEnumerable<NetMethod> CreateMethods(TypeDefinition type, NetType typeModel)
+        private IList<NetMethod> CreateMethods(TypeDefinition type, NetType typeModel)
         {
             var methodScanner = new MethodScanner(Reader, Factory, Logger);
 
-            var methods = type.GetMethods()
+            return type.GetMethods()
                 .Select(Reader.GetMethodDefinition)
-                .Where(IncludeMethod);
-
-            foreach (var method in methods)
-            {
-                var methodModel = methodScanner.ScanMethod(method, typeModel);
-
-                if (methodModel == null)
-                {
-                    continue;
-                }
-
-                yield return methodModel;
-            }
+                .Where(IncludeMethod)
+                .Select(method => methodScanner.ScanMethod(method, typeModel))
+                .ToList();
         }
 
         private bool IncludeMethod(MethodDefinition method)
@@ -191,51 +144,37 @@
             return true;
         }
 
-        private IEnumerable<NetProperty> CreateProperties(TypeDefinition type, NetType typeModel)
+        private IList<NetProperty> CreateProperties(TypeDefinition type, NetType typeModel)
         {
             var propertyScanner = new PropertyScanner(Reader, Factory, Logger);
 
-            foreach (var property in type.GetProperties().Select(Reader.GetPropertyDefinition))
-            {
-                var propertyModel = propertyScanner.ScanProperty(property, typeModel);
-
-                if (propertyModel == null)
-                {
-                    continue;
-                }
-
-                yield return propertyModel;
-            }
+            return type.GetProperties()
+                .Select(Reader.GetPropertyDefinition)
+                .Where(IncludeProperty)
+                .Select(property => propertyScanner.ScanProperty(property, typeModel))
+                .ToList();
         }
 
-
-        private void SetImplementedInterfaces(TypeDefinition type, NetType model)
+        private bool IncludeProperty(PropertyDefinition property)
         {
-            foreach (var interfaceImpl in type.GetInterfaceImplementations().Select(Reader.GetInterfaceImplementation))
-            {
-                var interfaceType = GetTypeFromEntityHandle(interfaceImpl.Interface);
-                if (interfaceType == null)
-                {
-                    return;
-                }
-
-                model.Implements.Add(interfaceType);
-            }
+            return !property.Attributes.HasFlag(PropertyAttributes.SpecialName);
+        }
+        
+        private IList<NetType> GetImplementedInterfaces(TypeDefinition type)
+        {
+            return type.GetInterfaceImplementations()
+                .Select(Reader.GetInterfaceImplementation)
+                .Select(interfaceImpl => GetTypeFromEntityHandle(interfaceImpl.Interface))
+                .Where(i => i != null)
+                .ToList();
         }
 
-        private void SetAttributes(TypeDefinition type, NetType model)
+        private IList<NetType> GetAttributes(TypeDefinition type)
         {
-            foreach (var attributeHandle in type.GetCustomAttributes())
-            {
-                var attributeType = GetTypeFromEntityHandle(attributeHandle);
-
-                if (attributeType == null)
-                {
-                    return;
-                }
-
-                model.Attributes.Add(attributeType);
-            }
+            return type.GetCustomAttributes()
+                .Select(GetTypeFromCustomAttributeHandle)
+                .Where(t => t != null)
+                .ToList();
         }
 
         private NetType GetTypeFromEntityHandle(EntityHandle handle)
@@ -268,8 +207,8 @@
 
         private NetType GetTypeFromMethodDefinitionHandle(MethodDefinitionHandle handle)
         {
-                var methodDefinition = Reader.GetMethodDefinition(handle);
-                return GetTypeFromEntityHandle(methodDefinition.GetDeclaringType());
+            var methodDefinition = Reader.GetMethodDefinition(handle);
+            return GetTypeFromEntityHandle(methodDefinition.GetDeclaringType());
         }
 
         private NetType GetTypeFromMemberReferenceHandle(MemberReferenceHandle handle)
