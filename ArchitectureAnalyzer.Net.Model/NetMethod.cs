@@ -5,6 +5,7 @@
     using ArchitectureAnalyzer.Core.Graph;
 
     using Newtonsoft.Json;
+    using Newtonsoft.Json.Converters;
 
     public class NetMethod : Node, IGenericContext
     {
@@ -17,6 +18,9 @@
         public bool IsSealed { get; set; }
 
         public bool IsGeneric { get; set; }
+
+        [JsonConverter(typeof(StringEnumConverter))]
+        public Visibility Visibility { get; set; }
 
         [JsonIgnore]
         public int Address { get; set; }

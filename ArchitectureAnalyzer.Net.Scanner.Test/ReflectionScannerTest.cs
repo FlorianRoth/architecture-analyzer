@@ -120,16 +120,7 @@
             AssertNodeInDatabase(
                 NetType<EmptyClass>());
         }
-
-        [Test]
-        public void InternalClassIsNotAddedToDatabase()
-        {
-            _scanner.Scan();
-
-            AssertNoNodeInDatabase(
-                NetType<InternalClass>());
-        }
-
+        
         [Test]
         public void MethodIsLinkedToDeclaringClass()
         {
@@ -211,16 +202,7 @@
             AssertNodeInDatabase(
                 NetMethod<ClassWithMembers>(nameof(ClassWithMembers.SomeMethod)));
         }
-
-        [Test]
-        public void InternalMethodIsNotAddedToDatabase()
-        {
-            _scanner.Scan();
-
-            AssertNoNodeInDatabase(
-                NetMethod<ClassWithMembers>(nameof(ClassWithMembers.InternalMethod)));
-        }
-
+        
         [Test]
         public void ConstructorIsAddedToDatabase()
         {

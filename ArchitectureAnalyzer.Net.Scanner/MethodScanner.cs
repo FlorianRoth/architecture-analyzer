@@ -1,5 +1,6 @@
 ﻿namespace ArchitectureAnalyzer.Net.Scanner
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
@@ -13,50 +14,6 @@
 
     internal class MethodScanner : AbstractScanner
     {
-        private static readonly ISet<string> SpecialNames =
-            new HashSet<string>
-                {
-                    ".ctor",
-                    "op_Implicit",
-                    "op_Explicit",
-                    "op_Addition",
-                    "op_Subtraction",
-                    "op_Multiply",
-                    "op_Division",
-                    "op_Modulus",
-                    "op_ExclusiveOr",
-                    "op_BitwiseAnd",
-                    "op_BitwiseOr",
-                    "op_LogicalAnd",
-                    "op_LogicalOr",
-                    "op_Assign",
-                    "op_LeftShift",
-                    "op_RightShift",
-                    "op_SignedRightShift",
-                    "op_UnsignedRightShift",
-                    "op_Equality",
-                    "op_GreaterThan",
-                    "op_LessThan",
-                    "op_Inequality",
-                    "op_GreaterThanOrEqual",
-                    "op_LessThanOrEqual",
-                    "op_MultiplicationAssignment",
-                    "op_SubtractionAssignment",
-                    "op_ExclusiveOrAssignment",
-                    "op_LeftShiftAssignment",
-                    "op_ModulusAssignment",
-                    "op_AdditionAssignment",
-                    "op_BitwiseAndAssignment",
-                    "op_BitwiseOrAssignment",
-                    "op_Comma",
-                    "op_DivisionAssignment",
-                    "op_Decrement",
-                    "op_Increment",
-                    "op_UnaryNegation",
-                    "op_UnaryPlus",
-                    "op_OnesComplement"
-                };
-
         public MethodScanner(MetadataReader reader, IModelFactory factory, ILogger logger)
             : base(reader, factory, logger)
         {
@@ -66,11 +23,6 @@
         {
             Logger.LogTrace("    Scanning method '{0}'", method.Name.GetString(Reader));
 
-            if (IncludeMethod(method) == false)
-            {
-                return null;
-            }
-            
             var key = new MethodKey(
                 typeModel.GetKey(),
                 method.Name.GetString(Reader),
@@ -78,6 +30,7 @@
 
             var methodModel = Factory.CreateMethodModel(key);
             methodModel.DeclaringType = typeModel;
+            methodModel.Visibility = GetVisibility(method);
             methodModel.IsAbstract = IsAbstract(method);
             methodModel.IsStatic = IsStatic(method);
             methodModel.IsSealed = IsSealed(method);
@@ -91,6 +44,31 @@
             methodModel.Parameters = CreateParameters(method, methodModel, signature.ParameterTypes);
             
             return methodModel;
+        }
+
+        private Visibility GetVisibility(MethodDefinition method)
+        {
+            if (method.Attributes.HasFlag(MethodAttributes.Public))
+            {
+                return Visibility.Public;
+            }
+
+            if (method.Attributes.HasFlag(MethodAttributes.Assembly))
+            {
+                return Visibility.Internal;
+            }
+
+            if (method.Attributes.HasFlag(MethodAttributes.Family))
+            {
+                return Visibility.Protected;
+            }
+
+            if (method.Attributes.HasFlag(MethodAttributes.Private))
+            {
+                return Visibility.Private;
+            }
+
+            throw new ArgumentOutOfRangeException();
         }
 
         private IReadOnlyList<NetMethodParameter> CreateParameters(
@@ -154,27 +132,6 @@
         private bool IsGeneric(MethodDefinition method)
         {
             return method.GetGenericParameters().Any();
-        }
-
-        private bool IncludeMethod(MethodDefinition method)
-        {
-            if ((method.Attributes & MethodAttributes.MemberAccessMask) != MethodAttributes.Public)
-            {
-                return false;
-            }
-
-            var name = method.Name.GetString(Reader);
-            if (SpecialNames.Contains(name))
-            {
-                return true;
-            }
-
-            if (method.Attributes.HasFlag(MethodAttributes.SpecialName))
-            {
-                return false;
-            }
-
-            return true;
         }
     }
 }

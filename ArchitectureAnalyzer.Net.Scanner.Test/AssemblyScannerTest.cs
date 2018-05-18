@@ -37,6 +37,7 @@
                                     {
                                         nameof(AbstractClass),
                                         nameof(ClassWithMembers),
+                                        nameof(DefaultVisiblityClass),
                                         nameof(EmptyClass),
                                         typeof(GenericClass<>).Name,
                                         nameof(IAgainExtendedInterface),
@@ -46,6 +47,7 @@
                                         nameof(InheritedClass),
                                         nameof(InheritedFromClassWithMembers),
                                         nameof(InheritsInterfaceFromBaseClass),
+                                        nameof(InternalClass),
                                         nameof(SealedClass),
                                         nameof(SomeEnum),
                                         nameof(StaticClass),

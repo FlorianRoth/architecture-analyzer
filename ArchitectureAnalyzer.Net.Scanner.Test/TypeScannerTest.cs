@@ -1,5 +1,7 @@
 ﻿namespace ArchitectureAnalyzer.Net.Scanner.Test
 {
+    using ArchitectureAnalyzer.Net.Model;
+
     using NUnit.Framework;
 
     using TestLibrary;
@@ -184,6 +186,36 @@
 
             Assert.That(model.GenericTypeArgs[0].Name, Is.EqualTo(typeof(GenericClass<>).Name + "<TTypeArg>"));
             Assert.That(model.GenericTypeArgs[0].Type, Is.EqualTo(Net.Model.NetType.TypeClass.GenericTypeArg));
+        }
+
+        [Test]
+        public void VisibilityIsPublicForPublicClass()
+        {
+            var type = GetTypeDefintion(typeof(EmptyClass));
+
+            var model = _scanner.ScanType(type);
+
+            Assert.That(model.Visibility, Is.EqualTo(Visibility.Public));
+        }
+
+        [Test]
+        public void VisibilityIsInternalForInternalClass()
+        {
+            var type = GetTypeDefintion(typeof(InternalClass));
+
+            var model = _scanner.ScanType(type);
+
+            Assert.That(model.Visibility, Is.EqualTo(Visibility.Internal));
+        }
+
+        [Test]
+        public void VisibilityIsInternalForDefaultVisiblityClass()
+        {
+            var type = GetTypeDefintion(typeof(DefaultVisiblityClass));
+
+            var model = _scanner.ScanType(type);
+
+            Assert.That(model.Visibility, Is.EqualTo(Visibility.Internal));
         }
     }
 }

@@ -34,9 +34,24 @@
         {
         }
 
+        public void PublicMethod()
+        {
+        }
+
         internal void InternalMethod()
         {
+        }
+    
+        protected void ProtectedMethod()
+        {
+        }
 
+        private void PrivateMethod()
+        {
+        }
+
+        void DefaultVisibilityMethod()
+        {
         }
 
         public static void StaticMethod()

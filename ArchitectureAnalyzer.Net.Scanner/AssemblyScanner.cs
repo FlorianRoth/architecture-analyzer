@@ -2,6 +2,7 @@
 namespace ArchitectureAnalyzer.Net.Scanner
 {
     using System.Linq;
+    using System.Reflection;
     using System.Reflection.Metadata;
 
     using ArchitectureAnalyzer.Net.Model;
@@ -33,18 +34,34 @@ namespace ArchitectureAnalyzer.Net.Scanner
             
             var typeScanner = new TypeScanner(Reader, Factory, Logger);
 
-            foreach (var type in Reader.TypeDefinitions.Select(Reader.GetTypeDefinition))
+            var types = Reader.TypeDefinitions
+                .Select(Reader.GetTypeDefinition)
+                .Where(IncludeType);
+
+            foreach (var type in types)
             {
                 var typeModel = typeScanner.ScanType(type);
-                if (typeModel == null)
-                {
-                    continue;
-                }
                 
                 assemblyModel.DefinedTypes.Add(typeModel);
             }
 
             return assemblyModel;
+        }
+
+        private bool IncludeType(TypeDefinition type)
+        {
+            if (type.Attributes.HasFlag(TypeAttributes.SpecialName))
+            {
+                return false;
+            }
+
+            var name = type.Name.GetString(Reader);
+            if (name.StartsWith("<"))
+            {
+                return false;
+            }
+
+            return true;
         }
 
         private NetAssembly CreateAssemblyModel(AssemblyReference assemblyReference)

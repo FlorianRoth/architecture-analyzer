@@ -25,15 +25,11 @@
         {
             Logger.LogTrace("  Scanning type '{0}'", type.Name.GetString(Reader));
 
-            if (IncludeType(type) == false)
-            {
-                return null;
-            }
-
             var typeKey = type.GetTypeKey(Reader);
 
             var typeModel = Factory.CreateTypeModel(typeKey);
             typeModel.Type = GetTypeClass(type);
+            typeModel.Visibility = GetVisibility(type);
             typeModel.IsStatic = IsStatic(type);
             typeModel.IsAbstract = IsAbstract(type);
             typeModel.IsSealed = IsSealed(type);
@@ -79,6 +75,34 @@
             }
 
             return NetType.TypeClass.Class;
+        }
+        
+        private Visibility GetVisibility(TypeDefinition type)
+        {
+            var visibility = type.Attributes & TypeAttributes.VisibilityMask;
+
+            switch (visibility)
+            {
+                case TypeAttributes.Public:
+                case TypeAttributes.NestedPublic:
+                    return Visibility.Public;
+
+                case TypeAttributes.NotPublic:
+                    return Visibility.Internal;
+
+
+                case TypeAttributes.NestedAssembly:
+                    return Visibility.Internal;
+
+                case TypeAttributes.NestedFamily:
+                    return Visibility.Protected;
+
+                case TypeAttributes.NestedPrivate:
+                    return Visibility.Private;
+                    
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
 
         private static bool IsSealed(TypeDefinition type)
@@ -134,7 +158,11 @@
         {
             var methodScanner = new MethodScanner(Reader, Factory, Logger);
 
-            foreach (var method in type.GetMethods().Select(Reader.GetMethodDefinition))
+            var methods = type.GetMethods()
+                .Select(Reader.GetMethodDefinition)
+                .Where(IncludeMethod);
+
+            foreach (var method in methods)
             {
                 var methodModel = methodScanner.ScanMethod(method, typeModel);
 
@@ -145,6 +173,22 @@
 
                 yield return methodModel;
             }
+        }
+
+        private bool IncludeMethod(MethodDefinition method)
+        {
+            var name = method.Name.GetString(Reader);
+            if (ScannerConstants.MethodSpecialNames.Contains(name))
+            {
+                return true;
+            }
+
+            if (method.Attributes.HasFlag(MethodAttributes.SpecialName))
+            {
+                return false;
+            }
+
+            return true;
         }
 
         private IEnumerable<NetProperty> CreateProperties(TypeDefinition type, NetType typeModel)
@@ -250,27 +294,6 @@
         {
             var id = Reader.GetTypeDefinition(handle).GetTypeKey(Reader);
             return Factory.CreateTypeModel(id);
-        }
-
-        private bool IncludeType(TypeDefinition type)
-        {
-            if ((type.Attributes & TypeAttributes.VisibilityMask) != TypeAttributes.Public)
-            {
-                return false;
-            }
-
-            if (type.Attributes.HasFlag(TypeAttributes.SpecialName))
-            {
-                return false;
-            }
-
-            var name = type.Name.GetString(Reader);
-            if (name.StartsWith("<"))
-            {
-                return false;
-            }
-
-            return true;
         }
     }
 }

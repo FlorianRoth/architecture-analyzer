@@ -2,6 +2,8 @@
 {
     using System;
 
+    using ArchitectureAnalyzer.Net.Model;
+
     using NUnit.Framework;
 
     using TestLibrary;
@@ -122,6 +124,20 @@
             Assert.That(model.IsAbstract, Is.False);
             Assert.That(model.IsSealed, Is.False);
             Assert.That(model.IsGeneric, Is.True);
+        }
+
+        [TestCase(nameof(ClassWithMembers.PublicMethod), ExpectedResult = Visibility.Public)]
+        [TestCase(nameof(ClassWithMembers.InternalMethod), ExpectedResult = Visibility.Internal)]
+        [TestCase("ProtectedMethod", ExpectedResult = Visibility.Protected)]
+        [TestCase("PrivateMethod", ExpectedResult = Visibility.Private)]
+        [TestCase("DefaultVisibilityMethod", ExpectedResult = Visibility.Private)]
+        public Visibility VisibilityIsCorrect(string methodName)
+        {
+            var method = GetMethodDefinition<ClassWithMembers>(methodName);
+
+            var model = _scanner.ScanMethod(method, NetType<ClassWithMembers>());
+
+            return model.Visibility;
         }
     }
 }

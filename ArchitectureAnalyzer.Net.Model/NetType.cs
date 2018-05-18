@@ -36,6 +36,9 @@
         public bool IsGeneric { get; set; }
         
         public bool HasAttribute { get; set; }
+        
+        [JsonConverter(typeof(StringEnumConverter))]
+        public Visibility Visibility { get; set; }
 
         [JsonIgnore]
         public NetType BaseType { get; set; }
