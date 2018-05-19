@@ -1,7 +1,6 @@
 ﻿namespace ArchitectureAnalyzer.Net.Scanner.Test
 {
     using ArchitectureAnalyzer.Core.Graph;
-    using ArchitectureAnalyzer.Net.Model;
 
     using FakeItEasy;
 
@@ -16,15 +15,18 @@
     {
         private ReflectionScanner _scanner;
 
-        private IGraphDatabase _database;
+        private IGraphDatabaseTransaction _tx;
         
         [SetUp]
         public void SetupScanner()
         {
-            _database = A.Fake<IGraphDatabase>();
+            _tx = A.Fake<IGraphDatabaseTransaction>();
+
+            var database = A.Fake<IGraphDatabase>();
+            A.CallTo(() => database.BeginTransaction()).Returns(_tx);
 
             var config = new ReflectionScannerConfiguration { Assemblies = new[] { AssemblyPath } };
-            _scanner = new ReflectionScanner(config, ModelFactory, _database, A.Fake<ILogger<ReflectionScanner>>());
+            _scanner = new ReflectionScanner(config, ModelFactory, database, A.Fake<ILogger<ReflectionScanner>>());
         }
 
         [Test]
@@ -290,27 +292,22 @@
 
         private void AssertNodeInDatabase<TNode>(TNode node) where TNode : Node
         {
-            A.CallTo(() => _database.CreateNode(node)).MustHaveHappened(Repeated.Exactly.Once);
+            A.CallTo(() => _tx.CreateNode(node)).MustHaveHappened(Repeated.Exactly.Once);
         }
 
         private void AssertNoNodeInDatabase<TNode>(TNode node) where TNode : Node
         {
-            A.CallTo(() => _database.CreateNode(node)).MustNotHaveHappened();
+            A.CallTo(() => _tx.CreateNode(node)).MustNotHaveHappened();
         }
         
         private void AssertRelationshipInDatabase<TFrom, TTo>(TFrom from, TTo to, string relationship) where TFrom : Node where TTo : Node
         {
-            A.CallTo(() => _database.CreateRelationship(from, to, relationship)).MustHaveHappened(Repeated.Exactly.Once);
+            A.CallTo(() => _tx.CreateRelationship(from, to, relationship)).MustHaveHappened(Repeated.Exactly.Once);
         }
-
-        private void AssertRelationshipInDatabase<TFrom, TTo, TRel>(TFrom from, TTo to, string relationship, TRel relationshipProperties) where TFrom : Node where TTo : Node
-        {
-            A.CallTo(() => _database.CreateRelationship(from, to, relationship, relationshipProperties)).MustHaveHappened(Repeated.Exactly.Once);
-        }
-
+        
         private void AssertNoRelationshipInDatabase<TFrom, TTo>(TFrom from, TTo to, string relationship) where TFrom : Node where TTo : Node
         {
-            A.CallTo(() => _database.CreateRelationship(from, to, relationship)).MustNotHaveHappened();
+            A.CallTo(() => _tx.CreateRelationship(from, to, relationship)).MustNotHaveHappened();
         }
     }
 }

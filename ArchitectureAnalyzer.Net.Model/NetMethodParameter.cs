@@ -1,19 +1,19 @@
 ﻿namespace ArchitectureAnalyzer.Net.Model
 {
+    using System.Collections.Generic;
+
     using ArchitectureAnalyzer.Core.Graph;
-
-    using Newtonsoft.Json;
-
+    
     public class NetMethodParameter : Node
     {
         public string Name { get; set; }
 
         public int Order { get; set; }
 
-        [JsonIgnore]
+        [Ignore]
         public NetType Type { get; set; }
 
-        [JsonIgnore]
+        [Ignore]
         public NetMethod DeclaringMethod { get; set; }
 
         public override string ToString()

@@ -4,22 +4,20 @@ namespace ArchitectureAnalyzer.Net.Model
     using System.Collections.Generic;
 
     using ArchitectureAnalyzer.Core.Graph;
-
-    using Newtonsoft.Json;
-
+    
     public class NetProperty : Node, IGenericContext
     {
         private static readonly IReadOnlyList<NetType> NoGenericParameters = new NetType[0];
 
         public string Name { get; set; }
 
-        [JsonIgnore]
+        [Ignore]
         public NetType Type { get; set; }
 
-        [JsonIgnore]
+        [Ignore]
         public NetType DeclaringType { get; set; }
 
-        [JsonIgnore]
+        [Ignore]
         public IReadOnlyList<NetType> GenericParameters => NoGenericParameters;
     }
 }

@@ -4,7 +4,6 @@ namespace ArchitectureAnalyzer.Core.Graph
     public abstract class Node
     {
         public long Id { get; set; }
-        
 
         public override bool Equals(object obj)
         {

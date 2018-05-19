@@ -3,10 +3,7 @@
     using System.Collections.Generic;
 
     using ArchitectureAnalyzer.Core.Graph;
-
-    using Newtonsoft.Json;
-    using Newtonsoft.Json.Converters;
-
+    
     public class NetMethod : Node, IGenericContext
     {
         public string Name { get; set; }
@@ -18,23 +15,19 @@
         public bool IsSealed { get; set; }
 
         public bool IsGeneric { get; set; }
-
-        [JsonConverter(typeof(StringEnumConverter))]
+        
         public Visibility Visibility { get; set; }
-
-        [JsonIgnore]
-        public int Address { get; set; }
-
-        [JsonIgnore]
+        
+        [Ignore]
         public NetType DeclaringType { get; set; }
 
-        [JsonIgnore]
+        [Ignore]
         public NetType ReturnType { get; set; }
 
-        [JsonIgnore]
+        [Ignore]
         public IReadOnlyList<NetMethodParameter> Parameters { get; set; }
 
-        [JsonIgnore]
+        [Ignore]
         public IReadOnlyList<NetType> GenericParameters { get; set; }
         
         public NetMethod()
@@ -42,7 +35,7 @@
             Parameters = new List<NetMethodParameter>();
             GenericParameters = new List<NetType>();
         }
-
+        
         public override string ToString()
         {
             return $"NetMethod({Name})";

@@ -16,7 +16,7 @@ namespace ArchitectureAnalyzer.Neo4j
             configure(config);
 
             services.AddSingleton(config);
-            services.AddSingleton<IGraphDatabase, Neo4jDatabase>();
+            services.AddSingleton<IGraphDatabase, Neo4JDatabase>();
         }
     }
 }

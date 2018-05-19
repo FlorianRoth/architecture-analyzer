@@ -4,10 +4,7 @@
     using System.Linq;
 
     using ArchitectureAnalyzer.Core.Graph;
-
-    using Newtonsoft.Json;
-    using Newtonsoft.Json.Converters;
-
+    
     public class NetType : Node
     {
         public enum TypeClass
@@ -18,8 +15,7 @@
             Enum,
             GenericTypeArg
         }
-
-        [JsonConverter(typeof(StringEnumConverter))]
+        
         public TypeClass Type { get; set; }
 
         public string Name { get; set; }
@@ -38,25 +34,24 @@
 
         public bool HasAttributes => Attributes.Any();
         
-        [JsonConverter(typeof(StringEnumConverter))]
         public Visibility Visibility { get; set; }
 
-        [JsonIgnore]
+        [Ignore]
         public NetType BaseType { get; set; }
 
-        [JsonIgnore]
+        [Ignore]
         public IList<NetType> Implements { get; set; }
 
-        [JsonIgnore]
+        [Ignore]
         public IList<NetType> Attributes { get; set; }
 
-        [JsonIgnore]
+        [Ignore]
         public IList<NetMethod> Methods { get; set; }
 
-        [JsonIgnore]
+        [Ignore]
         public IList<NetProperty> Properties { get; set; }
 
-        [JsonIgnore]
+        [Ignore]
         public IList<NetType> GenericTypeArgs { get; set; }
 
         public NetType()
@@ -68,7 +63,7 @@
             Properties = new List<NetProperty>();
             GenericTypeArgs = new List<NetType>();
         }
-
+        
         public override string ToString()
         {
             return $"NetType({Namespace}.{Name})";

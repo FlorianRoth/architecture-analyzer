@@ -8,7 +8,6 @@
 
     using Microsoft.Extensions.CommandLineUtils;
     using Microsoft.Extensions.DependencyInjection;
-    using Microsoft.Extensions.Logging;
 
     public static class Program
     {
@@ -73,7 +72,6 @@
             try
             {
                 database.Connect();
-                database.Clear();
 
                 scanner.Scan();
 
@@ -81,7 +79,7 @@
             }
             catch (Exception ex)
             {
-                serviceProvider.GetService<ILogger>().LogError(ex, ex.Message);
+                Console.WriteLine(ex.Message);
                 return EXIT_ERROR;
             }
             finally

@@ -7,7 +7,6 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.0.0" />
     <PackageReference Include="Neo4j.Driver" Version="1.5.2" />
-    <PackageReference Include="Neo4jClient" Version="3.0.1.14" />
   </ItemGroup>
 
   <ItemGroup>
