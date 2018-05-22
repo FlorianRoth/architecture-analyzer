@@ -60,7 +60,7 @@
             Assert.That(model.Parameters[1].Order, Is.EqualTo(1));
             Assert.That(model.Parameters[1].Type.Name, Is.EqualTo(nameof(String)));
         }
-
+        
         [Test]
         public void GenericParamtersAreCorrect()
         {

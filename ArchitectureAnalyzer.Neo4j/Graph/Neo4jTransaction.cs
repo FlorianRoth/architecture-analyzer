@@ -60,7 +60,6 @@ namespace ArchitectureAnalyzer.Neo4j.Graph
             var toId = toNode.Id;
 
             var statement = $"MATCH (from:{fromLabel} {{ Id: {{fromId}} }}), (to:{toLabel}  {{ Id: {{toId}} }})"
-                            //+ $" WHERE from.Id = {{fromId}} AND to.Id = {{toId}}"
                             + $" CREATE (from)-[:{relationType}]->(to)";
 
             var parameters = new Dictionary<string, object> { { "fromId", fromId }, { "toId", toId } };
