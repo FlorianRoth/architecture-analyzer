@@ -3,6 +3,8 @@ namespace ArchitectureAnalyzer.Net.Scanner.Test
 {
     using System;
 
+    using ArchitectureAnalyzer.Net.Model;
+
     using NUnit.Framework;
 
     using TestLibrary;
@@ -17,9 +19,11 @@ namespace ArchitectureAnalyzer.Net.Scanner.Test
         {
             _scanner = new PropertyScanner(MetadataReader, ModelFactory, Logger);
 
+            var assembly = new NetAssembly { Name = "TestLibrary" };
+
             var typeScanner = new TypeScanner(MetadataReader, ModelFactory, Logger);
-            typeScanner.ScanType(GetTypeDefintion<ClassWithMembers>());
-            typeScanner.ScanType(GetTypeDefintion<InheritedFromClassWithMembers>());
+            typeScanner.ScanType(GetTypeDefintion<ClassWithMembers>(), assembly);
+            typeScanner.ScanType(GetTypeDefintion<InheritedFromClassWithMembers>(), assembly);
         }
 
         [Test]

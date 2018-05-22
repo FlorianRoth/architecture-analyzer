@@ -1,5 +1,7 @@
 ﻿namespace ArchitectureAnalyzer.Net.Scanner.Test
 {
+    using System.Collections.Generic;
+
     using ArchitectureAnalyzer.Core.Graph;
 
     using FakeItEasy;
@@ -288,6 +290,28 @@
                 NetType(typeof(GenericClass<>)),
                 NetType(typeof(GenericClass<>), "TTypeArg"),
                 Relationship.DEFINES_GENERIC_TYPE_ARG);
+        }
+        
+        [Test]
+        public void GenericTypeInstantiationIsLinkedToGenericType()
+        {
+            _scanner.Scan();
+
+            AssertRelationshipInDatabase(
+                NetType(typeof(IEnumerable<string>)),
+                NetType(typeof(IEnumerable<>)),
+                Relationship.INSTANTIATES_GENERIC_TYPE);
+        }
+
+        [Test]
+        public void GenericTypeInstantiationIsLinkedToTypeArguments()
+        {
+            _scanner.Scan();
+
+            AssertRelationshipInDatabase(
+                NetType(typeof(IEnumerable<string>)),
+                NetType<string>(),
+                Relationship.HAS_TYPE_ARGUMENT);
         }
 
         private void AssertNodeInDatabase<TNode>(TNode node) where TNode : Node

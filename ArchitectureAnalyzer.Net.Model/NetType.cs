@@ -37,6 +37,9 @@
         public Visibility Visibility { get; set; }
 
         [Ignore]
+        public NetAssembly Assembly { get; set; }
+
+        [Ignore]
         public NetType BaseType { get; set; }
 
         [Ignore]
@@ -53,6 +56,16 @@
 
         [Ignore]
         public IList<NetType> GenericTypeArgs { get; set; }
+        
+        [Ignore]
+        public bool IsGenericTypeInstantiation { get; set; }
+        
+        [Ignore]
+        public NetType GenericType { get; set; }
+
+        [Ignore]
+        public IReadOnlyList<NetType> GenericTypeInstantiationArgs { get; set; }
+
 
         public NetType()
         {

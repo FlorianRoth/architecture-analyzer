@@ -29,7 +29,7 @@ namespace ArchitectureAnalyzer.Net.Scanner
             var assemblyModel = Factory.CreateAssemblyModel(AssemblyKey(name));
             
             assemblyModel.References = CreateAssemblyReferences();
-            assemblyModel.DefinedTypes = CreateTypes();
+            assemblyModel.DefinedTypes = CreateTypes(assemblyModel);
             
             return assemblyModel;
         }
@@ -48,14 +48,14 @@ namespace ArchitectureAnalyzer.Net.Scanner
             return Factory.CreateAssemblyModel(key);
         }
 
-        private IList<NetType> CreateTypes()
+        private IList<NetType> CreateTypes(NetAssembly assembly)
         {
             var typeScanner = new TypeScanner(Reader, Factory, Logger);
 
             return Reader.TypeDefinitions
                 .Select(Reader.GetTypeDefinition)
                 .Where(IncludeType)
-                .Select(type => typeScanner.ScanType(type))
+                .Select(type => typeScanner.ScanType(type, assembly))
                 .ToList();
         }
 

@@ -1,6 +1,8 @@
 ﻿namespace TestLibrary
 {
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
 
     public abstract class ClassWithMembers
     {
@@ -62,6 +64,11 @@
 
         public void GenericMethod<TMethodArg>()
         {
+        }
+
+        public IEnumerable<string> ReturnTypeIsGenericTypeInstantiation()
+        {
+            return Enumerable.Empty<string>();
         }
 
         public static bool operator==(ClassWithMembers a, ClassWithMembers b)

@@ -3,6 +3,7 @@ namespace ArchitectureAnalyzer.Net.Scanner
 {
     using System.Collections.Generic;
     using System.Linq;
+    using System.Runtime.InteropServices.ComTypes;
 
     using ArchitectureAnalyzer.Core.Graph;
     using ArchitectureAnalyzer.Net.Model;
@@ -37,8 +38,9 @@ namespace ArchitectureAnalyzer.Net.Scanner
             foreach (var assemblyModel in scannedAssemblies)
             {
                 ConnectAssemblyReferences(assemblyModel);
-                ConnectTypes(assemblyModel);
             }
+
+            ConnectTypes();
         }
 
         private void ClearDatabase()
@@ -79,24 +81,31 @@ namespace ArchitectureAnalyzer.Net.Scanner
             }
         }
 
-        private void ConnectTypes(NetAssembly assembly)
+        private void ConnectTypes()
         {
-            _logger.LogInformation("Connecting types for assembly '{0}'", assembly.Name);
+            _logger.LogInformation("Connecting types");
 
-            foreach (var type in assembly.DefinedTypes)
+            foreach (var type in _factory.GetTypeModels())
             {
-                ConnectTypeDefinitions(assembly, type);
+                ConnectTypeDefinition(type);
                 ConnectBaseType(type);
                 ConnectInterfaceImplementations(type);
                 ConnectMethods(type);
                 ConnectProperties(type);
                 ConnectAttributes(type);
                 ConnectGenericTypeArgs(type);
+                ConnectGenericTypeInstantiation(type);
             }
         }
 
-        private void ConnectTypeDefinitions(NetAssembly assembly, NetType type)
+        private void ConnectTypeDefinition(NetType type)
         {
+            var assembly = type.Assembly;
+            if (assembly == null)
+            {
+                return;
+            }
+
             _tx.CreateRelationship(assembly, type, Relationship.DEFINES_TYPE);
         }
 
@@ -173,6 +182,21 @@ namespace ArchitectureAnalyzer.Net.Scanner
             foreach (var arg in type.GenericTypeArgs)
             {
                 _tx.CreateRelationship(type, arg, Relationship.DEFINES_GENERIC_TYPE_ARG);
+            }
+        }
+
+        private void ConnectGenericTypeInstantiation(NetType type)
+        {
+            if (!type.IsGenericTypeInstantiation)
+            {
+                return;
+            }
+
+            _tx.CreateRelationship(type, type.GenericType, Relationship.INSTANTIATES_GENERIC_TYPE);
+
+            foreach (var arg in type.GenericTypeInstantiationArgs)
+            {
+                _tx.CreateRelationship(type, arg, Relationship.HAS_TYPE_ARGUMENT);
             }
         }
 

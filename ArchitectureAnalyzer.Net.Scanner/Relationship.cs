@@ -25,6 +25,10 @@ namespace ArchitectureAnalyzer.Net.Scanner
         
         public const string HAS_TYPE = "HAS_TYPE";
 
+        public const string HAS_TYPE_ARGUMENT = "HAS_TYPE_ARGUMENT";
+        
         public const string HAS_ATTRIBUTE = "HAS_ATTRIBUTE";
+
+        public const string INSTANTIATES_GENERIC_TYPE = "INSTANTIATES_GENERIC_TYPE";
     }
 }

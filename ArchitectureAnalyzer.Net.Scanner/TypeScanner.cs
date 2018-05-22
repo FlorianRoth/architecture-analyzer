@@ -21,7 +21,7 @@
         {
         }
 
-        public NetType ScanType(TypeDefinition type)
+        public NetType ScanType(TypeDefinition type, NetAssembly assembly)
         {
             Logger.LogTrace("  Scanning type '{0}'", type.Name.GetString(Reader));
 
@@ -29,6 +29,7 @@
 
             var typeModel = Factory.CreateTypeModel(typeKey);
             typeModel.Type = GetTypeClass(type);
+            typeModel.Assembly = assembly;
             typeModel.Visibility = GetVisibility(type);
             typeModel.IsStatic = IsStatic(type);
             typeModel.IsAbstract = IsAbstract(type);

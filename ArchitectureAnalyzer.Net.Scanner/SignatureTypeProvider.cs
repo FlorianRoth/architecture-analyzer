@@ -90,7 +90,12 @@ namespace ArchitectureAnalyzer.Net.Scanner
         {
             var key = genericType.GetKey().ToGenericType(typeArguments.Select(t => t.GetKey()));
 
-            return _factory.CreateTypeModel(key);
+            var typeModel = _factory.CreateTypeModel(key);
+            typeModel.IsGenericTypeInstantiation = true;
+            typeModel.GenericType = genericType;
+            typeModel.GenericTypeInstantiationArgs = typeArguments;
+
+            return typeModel;
         }
 
         public NetType GetArrayType(NetType elementType, ArrayShape shape)

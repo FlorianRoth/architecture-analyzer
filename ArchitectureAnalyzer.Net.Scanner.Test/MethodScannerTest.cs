@@ -1,6 +1,7 @@
 ﻿namespace ArchitectureAnalyzer.Net.Scanner.Test
 {
     using System;
+    using System.Collections.Generic;
 
     using ArchitectureAnalyzer.Net.Model;
 
@@ -18,9 +19,11 @@
         {
             _scanner = new MethodScanner(MetadataReader, ModelFactory, Logger);
 
+            var assembly = new NetAssembly { Name = "TestLibrary" };
+
             var typeScanner = new TypeScanner(MetadataReader, ModelFactory, Logger);
-            typeScanner.ScanType(GetTypeDefintion<ClassWithMembers>());
-            typeScanner.ScanType(GetTypeDefintion<InheritedFromClassWithMembers>());
+            typeScanner.ScanType(GetTypeDefintion<ClassWithMembers>(), assembly);
+            typeScanner.ScanType(GetTypeDefintion<InheritedFromClassWithMembers>(), assembly);
         }
         
         [Test]
@@ -70,7 +73,7 @@
 
             Assert.That(model.GenericParameters.Count, Is.EqualTo(1));
             
-            Assert.That(model.GenericParameters[0].Name, Is.EqualTo(nameof(ClassWithMembers) + "/GenericMethod(153)<TMethodArg>"));
+            Assert.That(model.GenericParameters[0].Name, Is.EqualTo(nameof(ClassWithMembers) + "/GenericMethod(175)<TMethodArg>"));
             Assert.That(model.GenericParameters[0].Type, Is.EqualTo(Net.Model.NetType.TypeClass.GenericTypeArg));
         }
 
@@ -138,6 +141,20 @@
             var model = _scanner.ScanMethod(method, NetType<ClassWithMembers>());
 
             return model.Visibility;
+        }
+
+        [Test]
+        public void GenericTypeInstantiationIsCorrect()
+        {
+            var method = GetMethodDefinition<ClassWithMembers>(nameof(ClassWithMembers.ReturnTypeIsGenericTypeInstantiation));
+
+            var model = _scanner.ScanMethod(method, NetType<ClassWithMembers>());
+
+            var returnType = model.ReturnType;
+
+            Assert.That(returnType.IsGenericTypeInstantiation, Is.True);
+            Assert.That(returnType.GenericType, Is.EqualTo(NetType(typeof(IEnumerable<>))));
+            Assert.That(returnType.GenericTypeInstantiationArgs, Is.EqualTo(new[] { NetType<string>() }));
         }
     }
 }

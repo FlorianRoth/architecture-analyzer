@@ -11,9 +11,12 @@
     {
         private TypeScanner _scanner;
 
+        private NetAssembly _assembly;
+
         [SetUp]
         public void SetupScanner()
         {
+            _assembly = NetAssembly("TestLibrary");
             _scanner = new TypeScanner(MetadataReader, ModelFactory, Logger);
         }
         
@@ -22,7 +25,7 @@
         {
             var type = GetTypeDefintion(typeof(EmptyClass));
 
-            var model = _scanner.ScanType(type);
+            var model = _scanner.ScanType(type, _assembly);
 
             Assert.That(model.Name, Is.EqualTo(nameof(EmptyClass)));
         }
@@ -32,7 +35,7 @@
         {
             var type = GetTypeDefintion(typeof(GenericClass<>));
 
-            var model = _scanner.ScanType(type);
+            var model = _scanner.ScanType(type, _assembly);
 
             Assert.That(model.Name, Is.EqualTo(typeof(GenericClass<>).Name));
         }
@@ -42,9 +45,19 @@
         {
             var type = GetTypeDefintion(typeof(EmptyClass));
 
-            var model = _scanner.ScanType(type);
+            var model = _scanner.ScanType(type, _assembly);
 
             Assert.That(model.Namespace, Is.EqualTo(typeof(EmptyClass).Namespace));
+        }
+
+        [Test]
+        public void AssemblyIsCorrect()
+        {
+            var type = GetTypeDefintion(typeof(EmptyClass));
+
+            var model = _scanner.ScanType(type, _assembly);
+
+            Assert.That(model.Assembly, Is.EqualTo(_assembly));
         }
 
         [Test]
@@ -52,7 +65,7 @@
         {
             var type = GetTypeDefintion(typeof(EmptyClass));
 
-            var model = _scanner.ScanType(type);
+            var model = _scanner.ScanType(type, _assembly);
 
             Assert.That(model.IsStatic, Is.False);
             Assert.That(model.IsAbstract, Is.False);
@@ -66,7 +79,7 @@
         {
             var type = GetTypeDefintion(typeof(StaticClass));
 
-            var model = _scanner.ScanType(type);
+            var model = _scanner.ScanType(type, _assembly);
 
             Assert.That(model.IsStatic, Is.True);
             Assert.That(model.IsAbstract, Is.False);
@@ -80,7 +93,7 @@
         {
             var type = GetTypeDefintion(typeof(AbstractClass));
 
-            var model = _scanner.ScanType(type);
+            var model = _scanner.ScanType(type, _assembly);
 
             Assert.That(model.IsStatic, Is.False);
             Assert.That(model.IsAbstract, Is.True);
@@ -94,7 +107,7 @@
         {
             var type = GetTypeDefintion(typeof(SealedClass));
 
-            var model = _scanner.ScanType(type);
+            var model = _scanner.ScanType(type, _assembly);
 
             Assert.That(model.IsStatic, Is.False);
             Assert.That(model.IsAbstract, Is.False);
@@ -108,7 +121,7 @@
         {
             var type = GetTypeDefintion(typeof(UserTypeAttributedClass));
 
-            var model = _scanner.ScanType(type);
+            var model = _scanner.ScanType(type, _assembly);
 
             Assert.That(model.IsStatic, Is.False);
             Assert.That(model.IsAbstract, Is.False);
@@ -122,7 +135,7 @@
         {
             var type = GetTypeDefintion(typeof(TestFixtureAttributedClass));
 
-            var model = _scanner.ScanType(type);
+            var model = _scanner.ScanType(type, _assembly);
 
             Assert.That(model.IsStatic, Is.False);
             Assert.That(model.IsAbstract, Is.False);
@@ -136,7 +149,7 @@
         {
             var type = GetTypeDefintion(typeof(GenericClass<>));
 
-            var model = _scanner.ScanType(type);
+            var model = _scanner.ScanType(type, _assembly);
 
             Assert.That(model.IsStatic, Is.False);
             Assert.That(model.IsAbstract, Is.False);
@@ -150,7 +163,7 @@
         {
             var type = GetTypeDefintion<EmptyClass>();
 
-            var model = _scanner.ScanType(type);
+            var model = _scanner.ScanType(type, _assembly);
 
             Assert.That(model.Type, Is.EqualTo(Net.Model.NetType.TypeClass.Class));
         }
@@ -160,7 +173,7 @@
         {
             var type = GetTypeDefintion<IInterface>();
 
-            var model = _scanner.ScanType(type);
+            var model = _scanner.ScanType(type, _assembly);
 
             Assert.That(model.Type, Is.EqualTo(Net.Model.NetType.TypeClass.Interface));
         }
@@ -170,7 +183,7 @@
         {
             var type = GetTypeDefintion<SomeEnum>();
 
-            var model = _scanner.ScanType(type);
+            var model = _scanner.ScanType(type, _assembly);
 
             Assert.That(model.Type, Is.EqualTo(Net.Model.NetType.TypeClass.Enum));
         }
@@ -180,7 +193,7 @@
         {
             var type = GetTypeDefintion(typeof(GenericClass<>));
 
-            var model = _scanner.ScanType(type);
+            var model = _scanner.ScanType(type, _assembly);
 
             Assert.That(model.GenericTypeArgs.Count, Is.EqualTo(1));
 
@@ -193,7 +206,7 @@
         {
             var type = GetTypeDefintion(typeof(EmptyClass));
 
-            var model = _scanner.ScanType(type);
+            var model = _scanner.ScanType(type, _assembly);
 
             Assert.That(model.Visibility, Is.EqualTo(Visibility.Public));
         }
@@ -203,7 +216,7 @@
         {
             var type = GetTypeDefintion(typeof(InternalClass));
 
-            var model = _scanner.ScanType(type);
+            var model = _scanner.ScanType(type, _assembly);
 
             Assert.That(model.Visibility, Is.EqualTo(Visibility.Internal));
         }
@@ -213,7 +226,7 @@
         {
             var type = GetTypeDefintion(typeof(DefaultVisiblityClass));
 
-            var model = _scanner.ScanType(type);
+            var model = _scanner.ScanType(type, _assembly);
 
             Assert.That(model.Visibility, Is.EqualTo(Visibility.Internal));
         }

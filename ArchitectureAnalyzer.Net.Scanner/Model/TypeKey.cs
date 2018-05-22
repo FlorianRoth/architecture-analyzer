@@ -1,6 +1,7 @@
 ﻿namespace ArchitectureAnalyzer.Net.Scanner.Model
 {
     using System;
+    using System.Linq;
 
     public struct TypeKey
     {
@@ -24,7 +25,19 @@
 
         public static TypeKey FromType(Type type)
         {
-            return new TypeKey(type.Namespace, type.Name);
+            var key = new TypeKey(type.Namespace, type.Name);
+
+            if (type.IsGenericTypeDefinition)
+            {
+                return key;
+            }
+
+            if (!type.IsGenericType)
+            {
+                return key;
+            }
+
+            return key.ToGenericType(type.GetGenericArguments().Select(FromType));
         }
 
         public static TypeKey FromTypeArgument(Type type, string typeArg)
