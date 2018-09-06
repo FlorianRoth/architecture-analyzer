@@ -17,11 +17,11 @@
         [SetUp]
         public void SetupScanner()
         {
-            _scanner = new MethodScanner(MetadataReader, ModelFactory, Logger);
+            _scanner = new MethodScanner(Module, ModelFactory, Logger);
 
             var assembly = new NetAssembly { Name = "TestLibrary" };
 
-            var typeScanner = new TypeScanner(MetadataReader, ModelFactory, Logger);
+            var typeScanner = new TypeScanner(Module, ModelFactory, Logger);
             typeScanner.ScanType(GetTypeDefintion<ClassWithMembers>(), assembly);
             typeScanner.ScanType(GetTypeDefintion<InheritedFromClassWithMembers>(), assembly);
         }
@@ -56,16 +56,16 @@
             Assert.That(model.Parameters.Count, Is.EqualTo(2));
 
             Assert.That(model.Parameters[0].Name, Is.EqualTo("a"));
-            Assert.That(model.Parameters[0].Order, Is.EqualTo(0));
+            Assert.That(model.Parameters[0].Order, Is.EqualTo(1));
             Assert.That(model.Parameters[0].Type.Name, Is.EqualTo(nameof(Int32)));
 
             Assert.That(model.Parameters[1].Name, Is.EqualTo("b"));
-            Assert.That(model.Parameters[1].Order, Is.EqualTo(1));
+            Assert.That(model.Parameters[1].Order, Is.EqualTo(2));
             Assert.That(model.Parameters[1].Type.Name, Is.EqualTo(nameof(String)));
         }
         
         [Test]
-        public void GenericParamtersAreCorrect()
+        public void GenericParametersAreCorrect()
         {
             var method = GetMethodDefinition<ClassWithMembers>(nameof(ClassWithMembers.GenericMethod));
 
@@ -73,8 +73,21 @@
 
             Assert.That(model.GenericParameters.Count, Is.EqualTo(1));
             
-            Assert.That(model.GenericParameters[0].Name, Is.EqualTo(nameof(ClassWithMembers) + "/GenericMethod(175)<TMethodArg>"));
+            Assert.That(model.GenericParameters[0].Name, Is.EqualTo("TMethodArg"));
             Assert.That(model.GenericParameters[0].Type, Is.EqualTo(Net.Model.NetType.TypeClass.GenericTypeArg));
+        }
+
+        [Test]
+        public void GenericMethodArgIsCorrect()
+        {
+            var method = GetMethodDefinition<ClassWithMembers>(nameof(ClassWithMembers.GenericMethodArg));
+            
+            var model = _scanner.ScanMethod(method, NetType<ClassWithMembers>());
+
+            Assert.That(model.Parameters.Count, Is.EqualTo(1));
+
+            Assert.That(model.Parameters[0].Name, Is.EqualTo("arg"));
+            Assert.That(model.Parameters[0].Type.Name, Is.EqualTo("TMethodArg"));
         }
 
         [Test]

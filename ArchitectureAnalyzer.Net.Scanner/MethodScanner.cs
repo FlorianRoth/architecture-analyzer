@@ -1,10 +1,7 @@
 ﻿namespace ArchitectureAnalyzer.Net.Scanner
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Reflection;
-    using System.Reflection.Metadata;
 
     using ArchitectureAnalyzer.Net.Model;
     using ArchitectureAnalyzer.Net.Scanner.Model;
@@ -12,36 +9,30 @@
 
     using Microsoft.Extensions.Logging;
 
+    using Mono.Cecil;
+    
     internal class MethodScanner : AbstractScanner
     {
-        public MethodScanner(MetadataReader reader, IModelFactory factory, ILogger logger)
-            : base(reader, factory, logger)
+        public MethodScanner(ModuleDefinition module, IModelFactory factory, ILogger logger)
+            : base(module, factory, logger)
         {
         }
 
         public NetMethod ScanMethod(MethodDefinition method, NetType typeModel)
         {
-            Logger.LogTrace("    Scanning method '{0}'", method.Name.GetString(Reader));
-
-            var key = new MethodKey(
-                typeModel.GetKey(),
-                method.Name.GetString(Reader),
-                method.Signature.GetHashCode());
-
-            var methodModel = Factory.CreateMethodModel(key);
+            Logger.LogTrace("    Scanning method '{0}'", method.Name);
+            
+            var methodModel = Factory.CreateMethodModel(method);
             methodModel.DeclaringType = typeModel;
             methodModel.Visibility = GetVisibility(method);
             methodModel.IsAbstract = IsAbstract(method);
             methodModel.IsStatic = IsStatic(method);
             methodModel.IsSealed = IsSealed(method);
             methodModel.IsGeneric = IsGeneric(method);
-            methodModel.GenericParameters = CreateGenericParameters(method, key);
-
-            var signatureTypeProvider = new SignatureTypeProvider(Factory);
-            var signature = method.DecodeSignature(signatureTypeProvider, methodModel);
-
-            methodModel.ReturnType = signature.ReturnType;
-            methodModel.Parameters = CreateParameters(method, methodModel, signature.ParameterTypes);
+            methodModel.GenericParameters = CreateGenericParameters(method);
+            
+            methodModel.ReturnType = GetTypeFromTypeReference(method.ReturnType);
+            methodModel.Parameters = CreateParameters(method, methodModel);
             
             return methodModel;
         }
@@ -53,45 +44,36 @@
 
         private IReadOnlyList<NetMethodParameter> CreateParameters(
             MethodDefinition method,
-            NetMethod methodModel,
-            IReadOnlyList<NetType> signatureParameterTypes)
+            NetMethod methodModel)
         {
-            return method.GetParameters()
-                .Select(Reader.GetParameter)
-                .Select((param, order) => CreateParameter(param, order, methodModel, signatureParameterTypes[order]))
+            return method.Parameters
+                .Select(param => CreateParameter(method, param, methodModel))
                 .ToList();
         }
 
         private NetMethodParameter CreateParameter(
-            Parameter param,
-            int order,
-            NetMethod methodModel,
-            NetType parameterType)
+            MethodDefinition method,
+            ParameterDefinition param,
+            NetMethod methodModel)
         {
-            var name = param.Name.GetString(Reader);
-            var key = new MethodParameterKey(methodModel.Id, name);
-
-            var model = Factory.CreateMethodParameter(key);
-            model.Order = order;
-            model.Type = parameterType;
+            var model = Factory.CreateMethodParameter(method, param);
+            model.Order = param.Sequence;
+            model.Type = GetTypeFromTypeReference(param.ParameterType);
             model.DeclaringMethod = methodModel;
 
             return model;
         }
 
-        private IReadOnlyList<NetType> CreateGenericParameters(MethodDefinition method, MethodKey methodKey)
+        private IReadOnlyList<NetType> CreateGenericParameters(MethodDefinition method)
         {
-            return method.GetGenericParameters()
-                .Select(Reader.GetGenericParameter)
-                .Select(arg => CreateGenericParameter(arg, methodKey))
+            return method.GenericParameters
+                .Select(CreateGenericParameter)
                 .ToList();
         }
 
-        private NetType CreateGenericParameter(GenericParameter arg, MethodKey methodKey)
+        private NetType CreateGenericParameter(GenericParameter arg)
         {
-            var name = arg.Name.GetString(Reader);
-
-            return Factory.CreateGenericParameter(methodKey, name);
+            return Factory.CreateGenericTypeArg(arg);
         }
 
         private static bool IsAbstract(MethodDefinition method)
@@ -109,9 +91,9 @@
             return method.Attributes.HasFlag(MethodAttributes.Final);
         }
 
-        private bool IsGeneric(MethodDefinition method)
+        private static bool IsGeneric(MethodDefinition method)
         {
-            return method.GetGenericParameters().Any();
+            return method.HasGenericParameters;
         }
     }
 }

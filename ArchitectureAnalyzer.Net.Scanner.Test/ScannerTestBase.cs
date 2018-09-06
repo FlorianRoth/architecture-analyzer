@@ -3,6 +3,7 @@
     using System;
     using System.IO;
     using System.Linq;
+    using System.Text;
     using System.Text.RegularExpressions;
 
     using ArchitectureAnalyzer.Net.Model;
@@ -11,6 +12,8 @@
     using FakeItEasy;
 
     using Microsoft.Extensions.Logging;
+
+    using Mono.Cecil;
 
     using NUnit.Framework;
 
@@ -41,27 +44,39 @@
 
         protected NetType NetType(Type type)
         {
-            var key = TypeKey.FromType(type);
+            var typeName = CreateFullName(type);
 
-            return ModelFactory.GetTypeModels().FirstOrDefault(t => Equals(t.GetKey(), key));
+            return ModelFactory.GetTypeModels().FirstOrDefault(t => Equals(t.FullName, typeName));
+        }
+
+        private static string CreateFullName(Type type)
+        {
+            var builder = new StringBuilder();
+            if (!string.IsNullOrEmpty(type.Namespace))
+            {
+                builder.Append(type.Namespace);
+                builder.Append(".");
+            }
+
+            builder.Append(type.Name);
+            if (type.IsGenericType && !type.ContainsGenericParameters)
+            {
+                builder.Append("<");
+                builder.AppendJoin(",", type.GenericTypeArguments.Select(CreateFullName));
+                builder.Append(">");
+            }
+
+           return builder.ToString();
         }
 
         protected NetType NetType(Type type, string typeArgName)
         {
-            var key = TypeKey.FromTypeArgument(type, typeArgName);
-
-            return ModelFactory.GetTypeModels().FirstOrDefault(t => Equals(t.GetKey(), key));
+            return NetType(type).GenericTypeArgs.First(t => t.Name == typeArgName);
         }
 
         protected NetType NetType<T>(string methodName, string typeArgName)
         {
-            var typeKey = TypeKey.FromType<T>();
-            
-            return ModelFactory
-                .GetTypeModels()
-                .Where(t => t.Type == Net.Model.NetType.TypeClass.GenericTypeArg)
-                .Where(t => t.Namespace == typeKey.Namespace)
-                .FirstOrDefault(t => Regex.IsMatch(t.Name, typeKey.Name + @"\/" + methodName + @"\([0-9]+\)<" + typeArgName + ">"));
+            return NetMethod<T>(methodName).GenericParameters.First(t => t.Name == typeArgName);
         }
 
         protected NetMethod NetMethod<T>(string methodName)

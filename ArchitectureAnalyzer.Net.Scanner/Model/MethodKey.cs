@@ -2,15 +2,15 @@
 {
     public struct MethodKey
     {
-        public TypeKey DeclaringType { get; }
+        public string Type { get; }
 
         public string Name { get; }
 
         public int SignatureHash { get; }
 
-        public MethodKey(TypeKey declaringType, string name, int signatureHash)
+        public MethodKey(string type, string name, int signatureHash)
         {
-            DeclaringType = declaringType;
+            Type = type;
             Name = name;
             SignatureHash = signatureHash;
         }

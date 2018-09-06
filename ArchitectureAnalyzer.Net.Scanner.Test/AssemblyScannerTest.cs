@@ -1,7 +1,8 @@
 ﻿namespace ArchitectureAnalyzer.Net.Scanner.Test
 {
     using System.Linq;
-    using System.Reflection.Metadata;
+
+    using Mono.Cecil;
 
     using NUnit.Framework;
 
@@ -12,12 +13,12 @@
     {
         private AssemblyScanner _scanner;
 
-        private AssemblyDefinition Assembly => MetadataReader.GetAssemblyDefinition();
+        private AssemblyDefinition Assembly => Module.Assembly;
 
         [SetUp]
         public void SetupScanner()
         {
-            _scanner = new AssemblyScanner(MetadataReader, ModelFactory, Logger);
+            _scanner = new AssemblyScanner(Module, ModelFactory, Logger);
         }
         
         [Test]

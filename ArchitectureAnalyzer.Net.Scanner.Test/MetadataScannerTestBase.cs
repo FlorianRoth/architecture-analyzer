@@ -3,47 +3,36 @@
     using System;
     using System.IO;
     using System.Linq;
-    using System.Reflection.Metadata;
-    using System.Reflection.PortableExecutable;
 
-    using ArchitectureAnalyzer.Net.Scanner.Utils;
+    using Mono.Cecil;
 
     using NUnit.Framework;
 
     public abstract class MetadataScannerTestBase : ScannerTestBase
     {
         private FileStream _stream;
-
-        private PEReader _peReader;
-
-        protected MetadataReader MetadataReader { get; private set; }
+        
+        protected ModuleDefinition Module { get; private set; }
 
         [SetUp]
         public void SetUpMetadataReader()
         {
             _stream = File.OpenRead(AssemblyPath);
-            _peReader = new PEReader(_stream);
 
-            MetadataReader = _peReader.GetMetadataReader();
+            Module = ModuleDefinition.ReadModule(_stream);
         }
 
         [TearDown]
         public void TearDownMetadataReader()
         {
-            _peReader.Dispose();
+            Module.Dispose();
             _stream.Dispose();
-        }
-
-        protected string GetString(StringHandle handle)
-        {
-            return handle.IsNil ? null : MetadataReader.GetString(handle);
         }
 
         protected TypeDefinition GetTypeDefintion(Type type)
         {
-            return MetadataReader.TypeDefinitions
-                .Select(MetadataReader.GetTypeDefinition)
-                .First(t => GetString(t.Name) == type.Name);
+            return Module.Types
+                .First(t => t.Name == type.Name);
         }
 
         protected TypeDefinition GetTypeDefintion<T>()
@@ -53,36 +42,12 @@
 
         protected MethodDefinition GetMethodDefinition<T>(string methodName)
         {
-            return MetadataReader.MethodDefinitions
-                .Select(MetadataReader.GetMethodDefinition)
-                .First(MatchTypeDefinition);
-
-            bool MatchTypeDefinition(MethodDefinition method)
-            {
-                var declaringType = method.GetDeclaringType();
-                var typeName = GetString(MetadataReader.GetTypeDefinition(declaringType).Name);
-
-                if (typeName != typeof(T).Name)
-                {
-                    return false;
-                }
-                
-                if (GetString(method.Name) != methodName)
-                {
-                    return false;
-                }
-
-                return true;
-            }
+            return GetTypeDefintion<T>().Methods.First(m => m.Name == methodName);
         }
 
         protected PropertyDefinition GetPropertyDefinition<T>(string propertyName)
         {
-            var typeDefinition = GetTypeDefintion<T>();
-            
-            return typeDefinition.GetProperties()
-                .Select(MetadataReader.GetPropertyDefinition)
-                .First(property => GetString(property.Name) == propertyName);
+            return GetTypeDefintion<T>().Properties.First(property => property.Name == propertyName);
         }
     }
 }

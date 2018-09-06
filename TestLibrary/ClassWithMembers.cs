@@ -66,6 +66,10 @@
         {
         }
 
+        public void GenericMethodArg<TMethodArg>(TMethodArg arg)
+        {
+        }
+
         public IEnumerable<string> ReturnTypeIsGenericTypeInstantiation()
         {
             return Enumerable.Empty<string>();

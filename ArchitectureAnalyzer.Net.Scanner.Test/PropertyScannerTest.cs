@@ -17,11 +17,11 @@ namespace ArchitectureAnalyzer.Net.Scanner.Test
         [SetUp]
         public void SetupScanner()
         {
-            _scanner = new PropertyScanner(MetadataReader, ModelFactory, Logger);
+            _scanner = new PropertyScanner(Module, ModelFactory, Logger);
 
             var assembly = new NetAssembly { Name = "TestLibrary" };
 
-            var typeScanner = new TypeScanner(MetadataReader, ModelFactory, Logger);
+            var typeScanner = new TypeScanner(Module, ModelFactory, Logger);
             typeScanner.ScanType(GetTypeDefintion<ClassWithMembers>(), assembly);
             typeScanner.ScanType(GetTypeDefintion<InheritedFromClassWithMembers>(), assembly);
         }

@@ -2,9 +2,10 @@
 namespace ArchitectureAnalyzer.Net.Scanner.Utils
 {
     using System;
-    using System.Reflection;
 
     using ArchitectureAnalyzer.Net.Model;
+
+    using Mono.Cecil;
 
     public static class VisibilityExtensions
     {

@@ -1,29 +1,35 @@
 ﻿namespace ArchitectureAnalyzer.Net.Scanner
 {
-    using System.Reflection.Metadata;
-
+    using ArchitectureAnalyzer.Net.Model;
     using ArchitectureAnalyzer.Net.Scanner.Model;
 
     using Microsoft.Extensions.Logging;
 
+    using Mono.Cecil;
+
     internal abstract class AbstractScanner
     {
-        protected MetadataReader Reader { get; }
+        protected ModuleDefinition Module { get; }
 
         protected IModelFactory Factory { get; }
 
         protected ILogger Logger { get; }
 
-        protected AbstractScanner(MetadataReader reader, IModelFactory factory, ILogger logger)
+        protected AbstractScanner(ModuleDefinition module, IModelFactory factory, ILogger logger)
         {
-            Reader = reader;
+            Module = module;
             Factory = factory;
             Logger = logger;
         }
 
-        protected static AssemblyKey AssemblyKey(string name)
+        protected NetType GetTypeFromCustomAttribute(CustomAttribute customAttribute)
         {
-            return new AssemblyKey(name);
+            return GetTypeFromTypeReference(customAttribute.AttributeType);
+        }
+
+        protected NetType GetTypeFromTypeReference(TypeReference typeReference)
+        {
+            return Factory.CreateTypeModel(typeReference);
         }
     }
 }

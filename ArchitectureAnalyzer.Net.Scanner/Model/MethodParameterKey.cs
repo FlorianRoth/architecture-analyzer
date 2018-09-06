@@ -2,13 +2,16 @@
 {
     public struct MethodParameterKey
     {
-        public long MethodId { get; set; }
+        public string Type { get; set; }
+
+        public string Method { get; set; }
 
         public string Name { get; }
 
-        public MethodParameterKey(long methodId, string name)
+        public MethodParameterKey(string type, string method, string name)
         {
-            MethodId = methodId;
+            Type = type;
+            Method = method;
             Name = name;
         }
     }

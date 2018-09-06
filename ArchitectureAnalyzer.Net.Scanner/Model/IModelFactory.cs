@@ -4,21 +4,24 @@
 
     using ArchitectureAnalyzer.Net.Model;
 
+    using Mono.Cecil;
+
     public interface IModelFactory
     {
-        NetAssembly CreateAssemblyModel(AssemblyKey key);
+        NetAssembly CreateAssemblyModel(AssemblyDefinition assemblyDefinition);
 
-        NetType CreateTypeModel(TypeKey key);
+        NetAssembly CreateAssemblyModel(AssemblyNameReference assemblyReference);
+        
+        NetType CreateTypeModel(TypeReference typeReference);
 
-        NetMethod CreateMethodModel(MethodKey key);
+        NetMethod CreateMethodModel(MethodDefinition methodDefinition);
 
-        NetMethodParameter CreateMethodParameter(MethodParameterKey key);
+        NetMethodParameter CreateMethodParameter(MethodDefinition method, ParameterDefinition param);
 
-        NetType CreateGenericTypeArg(TypeKey key, string typeArgName);
+        NetType CreateGenericTypeArg(GenericParameter parameter);
+        
+        NetProperty CreatePropertyModel(PropertyDefinition propertyDefinition);
 
-        NetType CreateGenericParameter(MethodKey key, string typeArgName);
-
-        NetProperty CreatePropertyModel(PropertyKey key);
 
         IEnumerable<NetAssembly> GetAssemblyModels();
         

@@ -1,15 +1,18 @@
 ﻿namespace ArchitectureAnalyzer.Net.Scanner.Model
 {
     using System.Collections.Generic;
+    using System.Linq;
 
     using ArchitectureAnalyzer.Core.Graph;
     using ArchitectureAnalyzer.Net.Model;
 
+    using Mono.Cecil;
+
     internal class ModelFactory : IModelFactory
     {
-        private readonly ModelMap<AssemblyKey, NetAssembly> _assemblyMap;
+        private readonly ModelMap<string, NetAssembly> _assemblyMap;
 
-        private readonly ModelMap<TypeKey, NetType> _typeMap;
+        private readonly ModelMap<string, NetType> _typeMap;
 
         private readonly ModelMap<MethodKey, NetMethod> _methodMap;
 
@@ -19,77 +22,89 @@
 
         public ModelFactory()
         {
-            _assemblyMap = new ModelMap<AssemblyKey, NetAssembly>();
-            _typeMap = new ModelMap<TypeKey, NetType>();
+            _assemblyMap = new ModelMap<string, NetAssembly>();
+            _typeMap = new ModelMap<string, NetType>();
             _methodMap = new ModelMap<MethodKey, NetMethod>();
             _methodParameterMap = new ModelMap<MethodParameterKey, NetMethodParameter>();
             _propertyMap = new ModelMap<PropertyKey, NetProperty>();
         }
 
-        public NetAssembly CreateAssemblyModel(AssemblyKey key)
+        public NetAssembly CreateAssemblyModel(AssemblyDefinition assemblyDefinition)
         {
-            var model =  _assemblyMap[key];
-            model.Name = key.Name;
+            var model =  _assemblyMap[assemblyDefinition.Name.Name];
+            model.Name = assemblyDefinition.Name.Name;
 
             return model;
         }
 
-        public NetType CreateTypeModel(TypeKey key)
+        public NetAssembly CreateAssemblyModel(AssemblyNameReference key)
         {
-            var model = _typeMap[key];
+            var model = _assemblyMap[key.Name];
             model.Name = key.Name;
-            model.DisplayName = key.Name;
-            model.Namespace = key.Namespace;
 
             return model;
         }
         
-        public NetMethod CreateMethodModel(MethodKey key)
+        public NetType CreateTypeModel(TypeReference typeReference)
         {
+            var model = _typeMap[typeReference.FullName];
+            model.FullName = typeReference.FullName;
+            model.Name = typeReference.Name;
+            model.DisplayName = model.Name;
+            model.Namespace = typeReference.Namespace;
+
+            if (typeReference is GenericInstanceType genericInstanceType)
+            {
+                model.IsGenericTypeInstantiation = true;
+                model.GenericType = CreateTypeModel(genericInstanceType.ElementType);
+                model.GenericTypeInstantiationArgs = genericInstanceType.GenericArguments.Select(CreateTypeModel).ToList();
+            }
+
+            return model;
+        }
+
+        public NetMethod CreateMethodModel(MethodDefinition methodDefinition)
+        {
+            var key = new MethodKey(methodDefinition.DeclaringType.FullName, methodDefinition.Name, 0);
+
             var model = _methodMap[key];
-            model.Name = key.Name;
+            model.Name = methodDefinition.Name;
 
             return model;
         }
 
-        public NetMethodParameter CreateMethodParameter(MethodParameterKey key)
+        public NetMethodParameter CreateMethodParameter(MethodDefinition method, ParameterDefinition param)
         {
+            var key = new MethodParameterKey(method.DeclaringType.FullName, method.Name, param.Name);
+
             var model = _methodParameterMap[key];
-            model.Name = key.Name;
+            model.Name = param.Name;
 
             return model;
         }
 
-        public NetType CreateGenericTypeArg(TypeKey key, string typeArgName)
+        public NetType CreateGenericTypeArg(GenericParameter parameter)
         {
-            var argKey = TypeKey.FromTypeArgument(key, typeArgName);
+            var typeName = parameter.DeclaringType?.FullName ?? parameter.DeclaringMethod.DeclaringType.Name;
 
-            var model = _typeMap[argKey];
-            model.Name = argKey.Name;
-            model.Namespace = argKey.Namespace;
-            model.DisplayName = typeArgName;
+            var key = $"{typeName}/{parameter.DeclaringMethod?.Name}/{parameter.Name}";
+
+            var model = _typeMap[key];
+            model.Name = parameter.Name;
+            model.Namespace = string.Empty;
+            model.FullName = key;
+            model.DisplayName = parameter.Name;
             model.Type = NetType.TypeClass.GenericTypeArg;
 
             return model;
         }
 
-        public NetType CreateGenericParameter(MethodKey key, string typeArgName)
+        public NetProperty CreatePropertyModel(PropertyDefinition propertyDefinition)
         {
-            var argKey = TypeKey.FromMethodTypeParameter(key, typeArgName);
+            var key = new PropertyKey(propertyDefinition.DeclaringType.FullName, propertyDefinition.Name);
 
-            var model = _typeMap[argKey];
-            model.Name = argKey.Name;
-            model.Namespace = argKey.Namespace;
-            model.DisplayName = typeArgName;
-            model.Type = NetType.TypeClass.GenericTypeArg;
-
-            return model;
-        }
-
-        public NetProperty CreatePropertyModel(PropertyKey key)
-        {
             var model = _propertyMap[key];
-            model.Name = key.Name;
+            model.Name = propertyDefinition.Name;
 
             return model;
         }

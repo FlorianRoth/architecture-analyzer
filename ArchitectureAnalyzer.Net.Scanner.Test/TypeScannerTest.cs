@@ -17,7 +17,7 @@
         public void SetupScanner()
         {
             _assembly = NetAssembly("TestLibrary");
-            _scanner = new TypeScanner(MetadataReader, ModelFactory, Logger);
+            _scanner = new TypeScanner(Module, ModelFactory, Logger);
         }
         
         [Test]
@@ -58,6 +58,16 @@
             var model = _scanner.ScanType(type, _assembly);
 
             Assert.That(model.Assembly, Is.EqualTo(_assembly));
+        }
+
+        [Test]
+        public void BaseTypeIsCorrect()
+        {
+            var type = GetTypeDefintion(typeof(InheritedClass));
+
+            var model = _scanner.ScanType(type, _assembly);
+
+            Assert.That(model.BaseType, Is.EqualTo(NetType<EmptyClass>()));
         }
 
         [Test]
@@ -197,7 +207,7 @@
 
             Assert.That(model.GenericTypeArgs.Count, Is.EqualTo(1));
 
-            Assert.That(model.GenericTypeArgs[0].Name, Is.EqualTo(typeof(GenericClass<>).Name + "<TTypeArg>"));
+            Assert.That(model.GenericTypeArgs[0].Name, Is.EqualTo("TTypeArg"));
             Assert.That(model.GenericTypeArgs[0].Type, Is.EqualTo(Net.Model.NetType.TypeClass.GenericTypeArg));
         }
 

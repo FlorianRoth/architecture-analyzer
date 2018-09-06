@@ -4,8 +4,6 @@
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using System.Reflection.Metadata;
-    using System.Reflection.PortableExecutable;
 
     using ArchitectureAnalyzer.Core.Graph;
     using ArchitectureAnalyzer.Core.Scanner;
@@ -13,6 +11,8 @@
     using ArchitectureAnalyzer.Net.Scanner.Model;
 
     using Microsoft.Extensions.Logging;
+
+    using Mono.Cecil;
 
     internal class ReflectionScanner : IScanner
     {
@@ -61,16 +61,14 @@
             try
             {
                 using (var stream = File.OpenRead(assemblyPath))
-                using (var peFile = new PEReader(stream))
+                using (var moduleDefinition = ModuleDefinition.ReadModule(stream))
                 {
-                    var metadataReader = peFile.GetMetadataReader();
                     var scanner = new AssemblyScanner(
-                        metadataReader,
+                        moduleDefinition,
                         _factory,
                         _logger);
-
-                    var assembly = metadataReader.GetAssemblyDefinition();
-                    return scanner.Scan(assembly);
+                    
+                    return scanner.Scan(moduleDefinition.Assembly);
                 }
             }
             catch (IOException ex)
